@@ -1,0 +1,51 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+* README.md
+* nb-configuration.xml
+* nbactions.xml
+* pom.xml
+* proguard-project.txt
+* scripts\
+* scripts\deploy-maps.sh
+* scripts\googlecode_upload.py
+* scripts\maven-install-mapsforge.sh
+* scripts\run.sh
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+* AndroidManifest.xml => app\src\main\AndroidManifest.xml
+* assets\ => app\src\main\assets\
+* libs\graphhopper-0.4-SNAPSHOT.jar => app\libs\graphhopper-0.4-SNAPSHOT.jar
+* libs\mapsforge-core-0.4.3.jar => app\libs\mapsforge-core-0.4.3.jar
+* libs\mapsforge-map-0.4.3.jar => app\libs\mapsforge-map-0.4.3.jar
+* libs\mapsforge-map-android-0.4.3.jar => app\libs\mapsforge-map-android-0.4.3.jar
+* libs\mapsforge-map-reader-0.4.3.jar => app\libs\mapsforge-map-reader-0.4.3.jar
+* libs\slf4j-android-1.6.1-RC1.jar => app\libs\slf4j-android-1.6.1-RC1.jar
+* libs\trove-3.0.3.jar => app\libs\trove-3.0.3.jar
+* res\ => app\src\main\res\
+* src\ => app\src\main\java\
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)

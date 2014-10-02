@@ -1,0 +1,29 @@
+apply plugin: 'android'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "20.0.0"
+
+    defaultConfig {
+        applicationId "com.graphhopper.android"
+        minSdkVersion 8
+        targetSdkVersion 19
+    }
+
+    buildTypes {
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile files('libs/graphhopper-0.4-SNAPSHOT.jar')
+    compile files('libs/mapsforge-core-0.4.3.jar')
+    compile files('libs/mapsforge-map-0.4.3.jar')
+    compile files('libs/mapsforge-map-android-0.4.3.jar')
+    compile files('libs/mapsforge-map-reader-0.4.3.jar')
+    compile files('libs/slf4j-android-1.6.1-RC1.jar')
+    compile files('libs/trove-3.0.3.jar')
+}
