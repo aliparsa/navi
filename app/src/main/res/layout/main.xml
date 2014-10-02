@@ -5,6 +5,14 @@
     android:orientation="vertical" >
 
     <LinearLayout
+        android:id="@+id/llConfig"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="100dp"
         android:orientation="horizontal" >
@@ -42,6 +50,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll"
         android:layout_width="fill_parent"
         android:layout_height="100dp"
         android:orientation="horizontal" >
@@ -64,5 +73,33 @@
             android:layout_height="60dp"
             android:text="Download" />
     </LinearLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/llMap2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <LinearLayout
+            android:id="@+id/llControls"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView"
+                android:src="@drawable/arrow"
+                />
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
 </LinearLayout>

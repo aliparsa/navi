@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.zip.Inflater;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Paint;
@@ -24,11 +25,18 @@ import org.mapsforge.map.layer.renderer.TileRendererLayer;
 import org.mapsforge.map.rendertheme.InternalRenderTheme;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -43,6 +51,9 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,6 +87,11 @@ public class MainActivity extends Activity
     private File mapsFolder;
     private TileCache tileCache;
 
+    // my fields
+    private LatLong lastKnowLocation;
+    private boolean shouldFollowGPS= true;
+    private Context context;
+
     protected boolean onMapTap( LatLong tapLatLong, Point layerXY, Point tapXY )
     {
         if (!isReady())
@@ -87,6 +103,8 @@ public class MainActivity extends Activity
             return false;
         }
         Layers layers = mapView.getLayerManager().getLayers();
+
+
 
         if (start != null && end == null)
         {
@@ -125,11 +143,13 @@ public class MainActivity extends Activity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        context=this;
         AndroidGraphicFactory.createInstance(getApplication());
 
         mapView = new MapView(this);
         mapView.setClickable(true);
         mapView.setBuiltInZoomControls(true);
+
 
         tileCache = AndroidUtil.createTileCache(this, getClass().getSimpleName(), mapView.getModel().displayModel.getTileSize(),
                 1f, mapView.getModel().frameBufferModel.getOverdrawFactor());
@@ -162,10 +182,28 @@ public class MainActivity extends Activity
         // TODO get user confirmation to download
         // if (AndroidHelper.isFastDownload(this))
         
-        // ali code
+
         
         //chooseAreaFromRemote();
         chooseAreaFromLocal();
+
+        // ali code
+
+        ImageView img = (ImageView) findViewById(R.id.imageView);
+        img.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                shouldFollowGPS = !shouldFollowGPS;
+                Toast.makeText(context,"Follow GPS >"+shouldFollowGPS,Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        LocationManager locationManager = (LocationManager) getApplicationContext()
+                .getSystemService(Context.LOCATION_SERVICE);
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                2000, 5, listener);
     }
 
     @Override
@@ -412,11 +450,25 @@ public class MainActivity extends Activity
         tileRendererLayer.setMapFile(mapFile);
         tileRendererLayer.setTextScale(1.5f);
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
-        mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(), (byte) 15));
+//        mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(), (byte) 15));
+        mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(new LatLong(29.6164,52.5198), (byte) 15));
+
         mapView.getLayerManager().getLayers().add(tileRendererLayer);
 
-        setContentView(mapView);
+
+        mapView.setBackgroundColor(Color.WHITE);
+
+        LinearLayout llCongig = (LinearLayout) findViewById(R.id.llConfig);
+        llCongig.setVisibility(View.GONE);
+
+        RelativeLayout llMap = (RelativeLayout) findViewById(R.id.llMap2);
+
+        llMap.addView(mapView,0);
+       // setContentView(mapView);
         loadGraphStorage();
+
+
+
     }
 
     void loadGraphStorage()
@@ -459,7 +511,7 @@ public class MainActivity extends Activity
     {
         Paint paintStroke = AndroidGraphicFactory.INSTANCE.createPaint();
         paintStroke.setStyle(Style.STROKE);
-        paintStroke.setColor(Color.argb(200, 0, 0xCC, 0x33));
+        paintStroke.setColor(Color.BLUE);
         paintStroke.setDashPathEffect(new float[]
         {
             25, 15
@@ -577,4 +629,63 @@ public class MainActivity extends Activity
         }
         return true;
     }
+
+
+    private void showImgOnThisPoint(LatLong latlong,int IMGresID) {
+        Marker marker = new Marker(latlong,
+                AndroidGraphicFactory.convertToBitmap(getResources().getDrawable(IMGresID)) ,
+                0,
+                0);
+
+
+        while(mapView.getLayerManager().getLayers().size()>1)
+        {
+            mapView.getLayerManager().getLayers().remove(1);
+        }
+        mapView.getLayerManager().getLayers().add(marker);
+    }
+
+    private void animateToPoint(double lat, double lon){
+        LatLong latlong = new LatLong(lat,lon);
+        mapView.getModel().mapViewPosition.animateTo(latlong);
+    }
+
+    private LocationListener listener = new LocationListener() {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            // TODO Auto-generated method stub
+
+            lastKnowLocation =  new LatLong(location.getLatitude(),location.getLongitude());
+            showImgOnThisPoint(lastKnowLocation,R.drawable.point);
+
+            if (shouldFollowGPS)
+                animateToPoint(location.getLatitude(),location.getLongitude());
+            //showThisPointOnMap(location.getLatitude(),location.getLongitude());
+
+            //Toast.makeText(context,"new location :)",Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            // TODO Auto-generated method stub
+            //Toast.makeText(context,"onProviderDisabled",Toast.LENGTH_SHORT).show();
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            // TODO Auto-generated method stub
+            //Toast.makeText(context,"onProviderEnabled",Toast.LENGTH_SHORT).show();
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // TODO Auto-generated method stub
+            //Toast.makeText(context,"onStatusChanged",Toast.LENGTH_SHORT).show();
+
+
+        }
+    };
 }
