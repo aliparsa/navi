@@ -527,6 +527,8 @@ public class MainActivity extends Activity
         for (int i = 0; i < response.getPoints().getSize(); i++)
         {
             geoPoints.add(new LatLong(tmp.getLatitude(i), tmp.getLongitude(i)));
+
+
         }
 
         return line;
@@ -638,10 +640,7 @@ public class MainActivity extends Activity
                 0);
 
 
-        while(mapView.getLayerManager().getLayers().size()>1)
-        {
-            mapView.getLayerManager().getLayers().remove(1);
-        }
+        clearMapView();
         mapView.getLayerManager().getLayers().add(marker);
     }
 
@@ -657,6 +656,7 @@ public class MainActivity extends Activity
             // TODO Auto-generated method stub
 
             lastKnowLocation =  new LatLong(location.getLatitude(),location.getLongitude());
+
             showImgOnThisPoint(lastKnowLocation,R.drawable.point);
 
             if (shouldFollowGPS)
@@ -688,4 +688,12 @@ public class MainActivity extends Activity
 
         }
     };
+
+
+    public void clearMapView(){
+        while(mapView.getLayerManager().getLayers().size()>1)
+        {
+            mapView.getLayerManager().getLayers().remove(1);
+        }
+    }
 }
