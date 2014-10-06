@@ -3,10 +3,10 @@ package com.graphhopper.android;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.zip.Inflater;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Paint;
@@ -15,6 +15,7 @@ import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
+import org.mapsforge.map.android.rendertheme.AssetsRenderTheme;
 import org.mapsforge.map.android.util.AndroidUtil;
 import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.layer.Layers;
@@ -22,11 +23,10 @@ import org.mapsforge.map.layer.cache.TileCache;
 import org.mapsforge.map.layer.overlay.Marker;
 import org.mapsforge.map.layer.overlay.Polyline;
 import org.mapsforge.map.layer.renderer.TileRendererLayer;
-import org.mapsforge.map.rendertheme.InternalRenderTheme;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,6 +34,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -58,9 +60,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
+import com.graphhopper.android.GpsHelper.GpsStatusListener;
 import com.graphhopper.util.Constants;
 import com.graphhopper.util.Downloader;
 import com.graphhopper.util.Helper;
@@ -68,7 +72,7 @@ import com.graphhopper.util.PointList;
 import com.graphhopper.util.ProgressListener;
 import com.graphhopper.util.StopWatch;
 
-public class MainActivity extends Activity
+public class MainActivity extends Activity implements GpsStatus.Listener
 {
     private MapView mapView;
     private GraphHopper hopper;
@@ -89,8 +93,12 @@ public class MainActivity extends Activity
 
     // my fields
     private LatLong lastKnowLocation;
-    private boolean shouldFollowGPS= true;
+    private boolean lockOnGps = true;
     private Context context;
+    private GpsStatusListener gpsStatusListener;
+    TextView satlateInView;
+    LocationManager locationManager;
+
 
     protected boolean onMapTap( LatLong tapLatLong, Point layerXY, Point tapXY )
     {
@@ -105,12 +113,14 @@ public class MainActivity extends Activity
         Layers layers = mapView.getLayerManager().getLayers();
 
 
+       //showSelectorDialog( );
 
         if (start != null && end == null)
         {
+
             end = tapLatLong;
             shortestPathRunning = true;
-            Marker marker = createMarker(tapLatLong, R.drawable.flag_red);
+            Marker marker = createMarker(tapLatLong, R.drawable.destination);
             if (marker != null)
             {
                 layers.add(marker);
@@ -120,6 +130,7 @@ public class MainActivity extends Activity
                     end.longitude);
         } else
         {
+            //showSelectorDialog();
             start = tapLatLong;
             end = null;
             // remove all layers but the first one, which is the map
@@ -187,23 +198,40 @@ public class MainActivity extends Activity
         //chooseAreaFromRemote();
         chooseAreaFromLocal();
 
-        // ali code
 
+
+        // ali code start from here
+
+        satlateInView = (TextView) findViewById(R.id.satlate_in_view);
         ImageView img = (ImageView) findViewById(R.id.imageView);
         img.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                shouldFollowGPS = !shouldFollowGPS;
-                Toast.makeText(context,"Follow GPS >"+shouldFollowGPS,Toast.LENGTH_SHORT).show();
+                if (lastKnowLocation!=null) {
+                    lockOnGps = true;
+                    Toast.makeText(context, "Gps Location set center ", Toast.LENGTH_SHORT).show();
+
+                }
+                    else {
+                    Toast.makeText(context, "Position not defined yet", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
 
-        LocationManager locationManager = (LocationManager) getApplicationContext()
+         locationManager = (LocationManager) getApplicationContext()
                 .getSystemService(Context.LOCATION_SERVICE);
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 2000, 5, listener);
+
+        locationManager.addGpsStatusListener(this);
+
+        Toast.makeText(context,locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).toString(),Toast.LENGTH_SHORT).show();
+
+
+
+        // ali code end here
     }
 
     @Override
@@ -368,6 +396,29 @@ public class MainActivity extends Activity
         });
     }
 
+    @Override
+    public void onGpsStatusChanged(int i) {
+        GpsStatus gpsStatus = locationManager.getGpsStatus(null);
+        if(gpsStatus != null) {
+            Iterable<GpsSatellite>satellites = gpsStatus.getSatellites();
+            Iterator<GpsSatellite> sat = satellites.iterator();
+            int j=0;
+            int CountInView = 0;
+            int CountInUse = 0;
+
+
+            if (satellites != null) {
+                for (GpsSatellite gpsSatellite : satellites) {
+                    CountInView++;
+                    if (gpsSatellite.usedInFix()) {
+                        CountInUse++;
+                    }
+                }
+                satlateInView.setText("in view: "+CountInView+"\n in use: "+CountInUse);
+        }
+    }
+    }
+
     public interface MySpinnerListener
     {
         void onSelect( String selectedArea, String selectedFile );
@@ -433,7 +484,7 @@ public class MainActivity extends Activity
 
     void loadMap( File areaFolder )
     {
-        logUser("loading map");
+        logUser("بارگذاری نقشه");
         File mapFile = new File(areaFolder, currentArea + ".map");
 
         mapView.getLayerManager().getLayers().clear();
@@ -449,7 +500,17 @@ public class MainActivity extends Activity
                 };
         tileRendererLayer.setMapFile(mapFile);
         tileRendererLayer.setTextScale(1.5f);
-        tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
+
+
+
+        try {
+            tileRendererLayer.setXmlRenderTheme(new AssetsRenderTheme(context, "", "myRender.xml"));
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        //tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
 //        mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(), (byte) 15));
         mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(new LatLong(29.6164,52.5198), (byte) 15));
 
@@ -555,7 +616,7 @@ public class MainActivity extends Activity
                 StopWatch sw = new StopWatch().start();
                 GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon).
                         setAlgorithm("dijkstrabi").
-                        putHint("instructions", false).
+                        putHint("instructions", true).
                         putHint("douglas.minprecision", 1);
                 GHResponse resp = hopper.route(req);
                 time = sw.stop().getSeconds();
@@ -638,15 +699,11 @@ public class MainActivity extends Activity
                 AndroidGraphicFactory.convertToBitmap(getResources().getDrawable(IMGresID)) ,
                 0,
                 0);
-
-
-        clearMapView();
         mapView.getLayerManager().getLayers().add(marker);
     }
 
     private void animateToPoint(double lat, double lon){
-        LatLong latlong = new LatLong(lat,lon);
-        mapView.getModel().mapViewPosition.animateTo(latlong);
+        mapView.getModel().mapViewPosition.animateTo(new LatLong(lat,lon));
     }
 
     private LocationListener listener = new LocationListener() {
@@ -655,15 +712,17 @@ public class MainActivity extends Activity
         public void onLocationChanged(Location location) {
             // TODO Auto-generated method stub
 
-            lastKnowLocation =  new LatLong(location.getLatitude(),location.getLongitude());
+            lastKnowLocation = new LatLong(location.getLatitude(), location.getLongitude());
 
-            showImgOnThisPoint(lastKnowLocation,R.drawable.point);
+            clearMapView();
 
-            if (shouldFollowGPS)
-                animateToPoint(location.getLatitude(),location.getLongitude());
-            //showThisPointOnMap(location.getLatitude(),location.getLongitude());
+            showImgOnThisPoint(lastKnowLocation, R.drawable.blue_circle);
 
-            //Toast.makeText(context,"new location :)",Toast.LENGTH_SHORT).show();
+            if (lockOnGps) {
+
+                animateToPoint(location.getLatitude(), location.getLongitude());
+            }
+            Toast.makeText(context,"new location",Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -683,7 +742,8 @@ public class MainActivity extends Activity
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             // TODO Auto-generated method stub
-            //Toast.makeText(context,"onStatusChanged",Toast.LENGTH_SHORT).show();
+            satlateInView.setText(gpsStatusListener.getSatlateInView()+"");
+
 
 
         }
@@ -696,4 +756,33 @@ public class MainActivity extends Activity
             mapView.getLayerManager().getLayers().remove(1);
         }
     }
+
+
+    public void showSelectorDialog(){
+        Dialog dialog = new AlertDialog.Builder(context)
+                .setIconAttribute(android.R.attr.alertDialogIcon)
+                .setTitle("Choice is yours !")
+                .setSingleChoiceItems(new String[]{"Source: On Map         Destination: On Map", "Source: GPS         Destination: On Map"}, 0, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                        /* User clicked on a radio button do some stuff */
+                    }
+                })
+                .create();
+
+        dialog.show();
+    }
+
+    /*
+    public static final int TURN_SHARP_LEFT = -3;
+    public static final int TURN_LEFT = -2;
+    public static final int TURN_SLIGHT_LEFT = -1;
+    public static final int CONTINUE_ON_STREET = 0;
+    public static final int TURN_SLIGHT_RIGHT = 1;
+    public static final int TURN_RIGHT = 2;
+    public static final int TURN_SHARP_RIGHT = 3;
+    public static final int FINISH = 4;
+    public static final int REACHED_VIA = 5;*/
+
+
 }
