@@ -8,6 +8,18 @@
         revision="20.0.0"
         sha1="42ccaf4761f0dfdfa805c9e340d99a755907e2dd"/>
     <item
+        dex="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\build\intermediates\pre-dexed\debug\mapsforge-map-android-0.4.3-60760a5437f06e61af7c5e4ba441271b3f0cfd9f.jar"
+        jar="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\libs\mapsforge-map-android-0.4.3.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="4b55aa59f9330be3e0e66e33e4057013dde54e22"/>
+    <item
+        dex="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\build\intermediates\pre-dexed\debug\mapsforge-core-0.4.3-90c0a3895df15d3787b5308af458b9b00b503485.jar"
+        jar="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\libs\mapsforge-core-0.4.3.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="f8805d5c4079a641cefe72e3b6a99fe01107bedf"/>
+    <item
         dex="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\build\intermediates\pre-dexed\debug\mapsforge-map-0.4.3-dbab6200925cba859154b671e511fb87b5a27087.jar"
         jar="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\libs\mapsforge-map-0.4.3.jar"
         jumboMode="false"
@@ -26,22 +38,10 @@
         revision="20.0.0"
         sha1="898c12a9a19f3b10b9f46f0e833fecba1d783f15"/>
     <item
-        dex="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\build\intermediates\pre-dexed\debug\mapsforge-map-android-0.4.3-60760a5437f06e61af7c5e4ba441271b3f0cfd9f.jar"
-        jar="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\libs\mapsforge-map-android-0.4.3.jar"
-        jumboMode="false"
-        revision="20.0.0"
-        sha1="4b55aa59f9330be3e0e66e33e4057013dde54e22"/>
-    <item
         dex="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\build\intermediates\pre-dexed\debug\slf4j-android-1.6.1-RC1-94e582c3d14c1a7270bb7700c2f912189612e659.jar"
         jar="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\libs\slf4j-android-1.6.1-RC1.jar"
         jumboMode="false"
         revision="20.0.0"
         sha1="fe76e182946faad493a50968f3344e848b467b42"/>
-    <item
-        dex="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\build\intermediates\pre-dexed\debug\mapsforge-core-0.4.3-90c0a3895df15d3787b5308af458b9b00b503485.jar"
-        jar="C:\Users\aliparsa\Desktop\mapsforge-25b5f2d0d6d8\mapsforge-25b5f2d0d6d8\Applications\Android\android\app\libs\mapsforge-core-0.4.3.jar"
-        jumboMode="false"
-        revision="20.0.0"
-        sha1="f8805d5c4079a641cefe72e3b6a99fe01107bedf"/>
 
 </pre-dex-items>

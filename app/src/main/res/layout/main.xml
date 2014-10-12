@@ -6,6 +6,7 @@
 
     <LinearLayout
         android:id="@+id/llConfig"
+        android:visibility="gone"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -82,6 +83,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
+
         <RelativeLayout
             android:id="@+id/llControls"
             android:orientation="horizontal"
@@ -93,13 +95,92 @@
             android:layout_alignParentStart="true">
 
             <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:id="@+id/imageView"
-                android:src="@drawable/gps_disconnected"
+                android:src="@drawable/location"
+                android:padding="3dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:id="@+id/imageView3"
+                android:src="@drawable/routing"
+                android:paddingLeft="10dp"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@id/imageView"
+                 />
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:id="@+id/imageView4"
+                android:src="@drawable/settings"
+                android:alpha="0.8"
+                android:paddingLeft="10dp"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@id/imageView3"
+                />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="80dp"
+                android:layout_alignBottom="@+id/imageView4"
+                android:layout_toRightOf="@+id/imageView4">
+
+                <Button
+                    android:id="@+id/taximeter1"
+                    android:layout_width="120dp"
+                    android:layout_height="80dp"
+                    android:background="#ccffef34"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:textSize="20dp"
+                    android:text="شروع تاکسی متر"/>
+
+                <Button
+                    android:id="@+id/taximeter2"
+                    android:layout_width="120dp"
+                    android:layout_height="80dp"
+                    android:background="#ccffef34"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:textSize="20dp"
+
+                    android:text="شروع تاکسی متر"/>
+
+                <Button
+                    android:id="@+id/taximeter3"
+                    android:layout_width="120dp"
+                    android:layout_height="80dp"
+                    android:background="#ccffef34"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:textSize="20dp"
+
+                    android:text="شروع تاکسی متر"/>
+
+                <Button
+                    android:id="@+id/taximeter4"
+                    android:layout_width="120dp"
+                    android:layout_height="80dp"
+                    android:background="#ccffef34"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:textSize="20dp"
+
+                    android:text="شروع تاکسی متر"/>
+
+
+            </LinearLayout>
+
+
+
+
 
             <LinearLayout
 
@@ -109,7 +190,8 @@
                 android:layout_alignParentRight="true"
                 android:gravity="center_vertical"
                 android:layout_alignParentEnd="true"
-                android:id="@+id/relativeLayout">
+                android:id="@+id/relativeLayout"
+                android:layout_alignParentBottom="true">
 
 
 
@@ -131,6 +213,51 @@
                     />
 
             </LinearLayout>
+
+
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:id="@+id/imageView6"
+                android:src="@drawable/compas"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:visibility="gone"
+                android:layout_width="170dp"
+                android:layout_height="fill_parent"
+                android:background="#aad1d0d2"
+                android:textColor="#ff000000"
+                android:scrollbars="vertical"
+                android:textSize="10dp"
+
+                android:id="@+id/log"
+                android:gravity="bottom"
+
+                android:layout_alignBottom="@+id/imageView4"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+
+
+
+                <ScrollView
+                    android:background="#aa979797"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:id="@+id/directionList"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        </LinearLayout>
+                    </ScrollView>
 
 
 
