@@ -42,6 +42,7 @@
                     android:exported="true" />
             </intent-filter>
         </receiver>
+
         <activity
             android:name=".Activities.MainActivity"
             android:label="@string/title_activity_main"
@@ -55,6 +56,7 @@
                 <action android:name="CONNECTION_STATUS" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".Services.ConnectionService"
             android:enabled="true" />
@@ -64,6 +66,7 @@
         <service
             android:name=".Services.LocationSenderService"
             android:enabled="true" />
+
         <activity
             android:name=".Activities.SettingActivity"
             android:label="@string/title_activity_setting"
@@ -75,6 +78,10 @@
         <activity
             android:name=".Activities.MessagingActivity"
             android:label="@string/title_activity_messaging" >
+        </activity>
+        <activity
+            android:name=".Activities.SearchPOIActivity"
+            android:label="@string/title_activity_search_poi" >
         </activity>
     </application>
 
