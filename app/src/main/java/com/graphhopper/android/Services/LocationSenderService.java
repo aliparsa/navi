@@ -11,7 +11,7 @@ import com.graphhopper.android.DataModel.MyLocation;
 import com.graphhopper.android.DataModel.ServerResponse;
 import com.graphhopper.android.Interfaces.CallBack;
 import com.graphhopper.android.Activities.MainActivity;
-import com.graphhopper.android.utilities.DatabaseHandler;
+import com.graphhopper.android.Helpers.DatabaseHelper;
 import com.graphhopper.android.utilities.Webservice;
 
 import org.apache.http.message.BasicNameValuePair;
@@ -84,8 +84,8 @@ public class LocationSenderService extends Service {
 
     public void SendAllUnsentPoint(){
         Log.i("alix","check DB for point");
-        final DatabaseHandler databaseHandler = new DatabaseHandler(MainActivity.context);
-        ArrayList<MyLocation> loc_list = databaseHandler.getUnsentLocations();
+        final DatabaseHelper databaseHelper = new DatabaseHelper(MainActivity.context);
+        ArrayList<MyLocation> loc_list = databaseHelper.getUnsentLocations();
 
         if (loc_list.size()==0)
             return;
@@ -130,7 +130,7 @@ public class LocationSenderService extends Service {
 //                        if (MainActivity.context != null)
 //                            ((MainActivity) MainActivity.context).alog("Data Sent");
 
-                        databaseHandler.bulkMarkRecordsAsSent(maximumId);
+                        databaseHelper.bulkMarkRecordsAsSent(maximumId);
                     }
 
                     @Override

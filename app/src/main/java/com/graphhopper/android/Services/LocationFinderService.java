@@ -15,7 +15,7 @@ import android.util.Log;
 
 
 import com.graphhopper.android.Activities.MainActivity;
-import com.graphhopper.android.utilities.DatabaseHandler;
+import com.graphhopper.android.Helpers.DatabaseHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -83,7 +83,7 @@ public class LocationFinderService extends Service {
                 return;
 
             // TODO save Location To DISK
-            DatabaseHandler db_handler = new DatabaseHandler(MainActivity.context);
+            DatabaseHelper db_handler = new DatabaseHelper(MainActivity.context);
 
             Calendar c = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

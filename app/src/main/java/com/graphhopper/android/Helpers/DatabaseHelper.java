@@ -1,4 +1,4 @@
-package com.graphhopper.android.utilities;
+package com.graphhopper.android.Helpers;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,13 +14,11 @@ import com.graphhopper.android.DataModel.MyLocation;
 import org.mapsforge.core.model.LatLong;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by aliparsa on 9/20/2014.
  */
-public class DatabaseHandler extends SQLiteOpenHelper {
+public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     // All Static variables
@@ -65,7 +63,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private int record_id;
     private int device_id;
 
-    public DatabaseHandler(Context context) {
+    public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

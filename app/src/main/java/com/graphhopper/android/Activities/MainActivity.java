@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -83,10 +85,14 @@ import com.graphhopper.android.DataModel.Taximeter;
 import com.graphhopper.android.DataModel.VoiceFlags;
 import com.graphhopper.android.GHAsyncTask;
 import com.graphhopper.android.GpsHelper.GpsStatusListener;
+import com.graphhopper.android.Helpers.GpsHelper;
+import com.graphhopper.android.Helpers.MapViewHelper;
+import com.graphhopper.android.Helpers.ServiceHelper;
+import com.graphhopper.android.Helpers.TaximeterHelper;
+import com.graphhopper.android.Helpers.TimeHelper;
 import com.graphhopper.android.R;
+import com.graphhopper.android.Routing.VoiceInstructions;
 import com.graphhopper.android.Services.ConnectionService;
-import com.graphhopper.android.Services.LocationFinderService;
-import com.graphhopper.android.Services.LocationSenderService;
 import com.graphhopper.android.utilities.TimerHelper;
 import com.graphhopper.util.Constants;
 import com.graphhopper.util.Downloader;
@@ -144,6 +150,11 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
     Taximeter taximeter2;
     Taximeter taximeter3;
     Taximeter taximeter4;
+    private int oldDayOfYear=-1;
+    private Location oldLocation;
+    private double todayDistance=0;
+
+    public static enum GpsState{connected,disconnected};
 
     public Location loc_lastKnowLocation;
 
@@ -316,7 +327,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                     btn_taximeter1.setBackgroundResource(R.drawable.taximeter_background);
 
                 } else {
-                    calculateAndShowFair(taximeter1);
+                    TaximeterHelper.calculateAndShowFair(context, taximeter1);
 
 
                     taximeter1 = null;
@@ -340,7 +351,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                 } else {
 
 
-                    calculateAndShowFair(taximeter2);
+                    TaximeterHelper.calculateAndShowFair(context, taximeter2);
 
 
                     taximeter2 = null;
@@ -364,7 +375,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
                 } else {
 
-                    calculateAndShowFair(taximeter3);
+                    TaximeterHelper.calculateAndShowFair(context, taximeter3);
 
 
                     taximeter3 = null;
@@ -389,7 +400,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                 } else {
 
 
-                    calculateAndShowFair(taximeter4);
+                    TaximeterHelper.calculateAndShowFair(context, taximeter4);
                     taximeter4 = null;
                     btn_taximeter4.setBackgroundResource(R.drawable.taximeter);
                     btn_taximeter4.setText("");
@@ -466,25 +477,25 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
                         if (taximeter1 != null) {
                             taximeter1.timer++;
-                            btn_taximeter1.setText(convertSecToStr(taximeter1.timer));
+                            btn_taximeter1.setText(TimeHelper.convertSecToStr(taximeter1.timer));
                             btn_taximeter1.append("\n" + (int)taximeter1.getRouteDistance() + "M");
                         }
 
                         if (taximeter2 != null) {
                             taximeter2.timer++;
-                            btn_taximeter2.setText(convertSecToStr(taximeter2.timer));
+                            btn_taximeter2.setText(TimeHelper.convertSecToStr(taximeter2.timer));
                             btn_taximeter2.append("\n" + (int)taximeter2.getRouteDistance() + "M");
 
                         }
                         if (taximeter3 != null) {
                             taximeter3.timer++;
-                            btn_taximeter3.setText(convertSecToStr(taximeter3.timer));
+                            btn_taximeter3.setText(TimeHelper.convertSecToStr(taximeter3.timer));
                             btn_taximeter3.append("\n" +(int) taximeter3.getRouteDistance() + "M");
 
                         }
                         if (taximeter4 != null) {
                             taximeter4.timer++;
-                            btn_taximeter4.setText(convertSecToStr(taximeter4.timer));
+                            btn_taximeter4.setText(TimeHelper.convertSecToStr(taximeter4.timer));
                             btn_taximeter4.append("\n" + (int)taximeter4.getRouteDistance() + "M");
 
                         }
@@ -534,19 +545,11 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
             }
         });
 
-        startConnectionService();
+        ServiceHelper.startConnectionService(this);
 
+        ServiceHelper.startLocationFinderService(this);
 
-
-
-
-        Intent mServiceIntent = new Intent(this, LocationFinderService.class);
-        startService(mServiceIntent);
-
-        // start location Sender on boot complete
-        Intent mServiceIntent2 = new Intent(this, LocationSenderService.class);
-        startService(mServiceIntent2);
-
+        ServiceHelper.startLocationSenderService(this);
 
         btnGpsStatus = (Button) findViewById(R.id.btnGpsStatus);
         btnSrvStatus = (Button) findViewById(R.id.btnSrvStatus);
@@ -586,26 +589,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         btnSos.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Dialog dialog = new AlertDialog.Builder(context)
-                        .setIconAttribute(android.R.attr.alertDialogIcon)
-                        .setTitle("درخواست کمک")
-                        .setCancelable(false)
-                        .setMessage("آیا درخواست کمک به سرور ارسال شود ؟")
-                        .setNegativeButton("خیر", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                // TODO Dismiss
-                            }
-                        })
-
-                        .setPositiveButton("بله", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                // TODO ersal darkhast help be server
-                            }
-                        })
-                        .create();
-                dialog.show();
+                showToast("موقعیت و درخواست شما به مرکز ارسال شد");
             }
         });
         // ali code end here
@@ -614,14 +598,15 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
     }
 
 
-    public String convertSecToStr(Long sec) {
 
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-        df.setTimeZone(tz);
-        return df.format(new Date(sec * 1000));
+    private void showToast(String s) {
 
+        Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
     }
+
+
+
+
 
     @Override
     protected void onDestroy() {
@@ -1050,7 +1035,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
 
 
-                    clearMapView();
+                    MapViewHelper.clearMapView(mapView);
 
                     showImgOnThisPoint(lastKnowLocation, R.drawable.blue_circle);
 
@@ -1224,9 +1209,12 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         @Override
         public void onLocationChanged(Location location) {
 
-            btnGpsStatus.setBackgroundColor(Color.GREEN);
-
             loc_lastKnowLocation = location;
+            updateGpsStateIcon(GpsState.connected);
+
+            updateSpeedValue(location);
+
+            updateDistanceValue(location);
 
 
             // send location to store in taximeters
@@ -1274,7 +1262,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                     // we are not in routing mode
                     // show new current point on map
                     log.append("NOT in routing mode\n");
-                    clearMapView();
+                    MapViewHelper.clearMapView(mapView);
                     showImgOnThisPoint(lastKnowLocation, R.drawable.blue_circle);
                 }
 
@@ -1305,11 +1293,42 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         }
     };
 
-    public void clearMapView() {
-        while (mapView.getLayerManager().getLayers().size() > 1) {
-            mapView.getLayerManager().getLayers().remove(1);
+    private void updateDistanceValue(Location location) {
+
+        Calendar c = Calendar.getInstance();
+        int newDayOfYear = c.get(Calendar.DAY_OF_YEAR);
+
+
+        if (oldDayOfYear==-1 || oldLocation==null || oldDayOfYear!=newDayOfYear){
+            oldLocation=location;
+            oldDayOfYear=newDayOfYear;
+            return;
+        }else
+        {
+            double betweenDistance = GpsHelper.distance(oldLocation,location );
+            todayDistance +=betweenDistance;
+            Button speed = (Button) findViewById(R.id.btnDistance);
+            speed.setText("مصافت پیموده شده امروز"+"\n"+(int)todayDistance+" m");
+        }
+
+        oldDayOfYear=newDayOfYear;
+        oldLocation=location;
+
+
+    }
+
+    private void updateSpeedValue(Location location) {
+        Button speed = (Button) findViewById(R.id.btnSpeed);
+        speed.setText("سرعت"+"\n"+(int)location.getSpeed()+" Km");
+    }
+
+    private void updateGpsStateIcon(GpsState gpsState) {
+        if (gpsState==GpsState.connected){
+            btnGpsStatus.setBackgroundColor(Color.GREEN);
         }
     }
+
+
 
     public void cancelRouting() {
         Dialog dialog = new AlertDialog.Builder(context)
@@ -1321,7 +1340,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         isInRoutingMode = false;
-                        clearMapView();
+                        MapViewHelper.clearMapView(mapView);
                         showImgOnThisPoint(lastKnowLocation, R.drawable.blue_circle);
                         llDirectionList.removeAllViews();
                         btnStopRouting.setVisibility(View.GONE);
@@ -1368,7 +1387,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         lastAzimuth = azimuth;
 
     }
-
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
@@ -1388,103 +1406,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
         if (taximeter4 != null)
             taximeter4.addToRoute(location);
-    }
-
-
-
-    public int getVoiceFromSign(int sign) {
-        switch (sign) {
-            case -3:
-                return R.raw.left_sh;
-            case -2:
-                return R.raw.left;
-            case -1:
-                return R.raw.left_sl;
-            case 0:
-                return R.raw.go_ahead;
-            case 1:
-                return R.raw.right_sl;
-            case 2:
-                return R.raw.right;
-            case 3:
-                return R.raw.right_sh;
-            case 4:
-                return R.raw.reached_destination;
-//            case 5:
-//                return "REACHED_VIA";
-
-        }
-        return 0;
-    }
-
-    public int getVoiceId(int meter) {
-
-        if (meter == 1) return R.raw._1;
-        if (meter == 2) return R.raw._2;
-        if (meter == 3) return R.raw._3;
-        if (meter == 4) return R.raw._4;
-        if (meter == 5) return R.raw._5;
-        if (meter == 6) return R.raw._6;
-        if (meter == 7) return R.raw._7;
-        if (meter == 8) return R.raw._8;
-        if (meter == 9) return R.raw._9;
-        if (meter == 10) return R.raw._10;
-        if (meter == 11) return R.raw._11;
-        if (meter == 12) return R.raw._12;
-        if (meter == 13) return R.raw._13;
-        if (meter == 14) return R.raw._14;
-        if (meter == 15) return R.raw._15;
-        if (meter == 16) return R.raw._16;
-        if (meter == 17) return R.raw._17;
-        if (meter == 18) return R.raw._18;
-        if (meter == 19) return R.raw._19;
-        if (meter > 19 && meter <= 20) return R.raw._20;
-        if (meter > 20 && meter <= 25) return R.raw._25;
-        if (meter > 25 && meter <= 30) return R.raw._30;
-        if (meter > 30 && meter <= 35) return R.raw._35;
-        if (meter > 35 && meter <= 40) return R.raw._40;
-        if (meter > 40 && meter <= 45) return R.raw._45;
-        if (meter > 45 && meter <= 50) return R.raw._50;
-        if (meter > 50 && meter <= 55) return R.raw._55;
-        if (meter > 55 && meter <= 60) return R.raw._60;
-        if (meter > 60 && meter <= 65) return R.raw._65;
-        if (meter > 65 && meter <= 70) return R.raw._70;
-        if (meter > 70 && meter <= 75) return R.raw._75;
-        if (meter > 75 && meter <= 80) return R.raw._80;
-        if (meter > 80 && meter <= 85) return R.raw._85;
-        if (meter > 85 && meter <= 90) return R.raw._90;
-        if (meter > 90 && meter <= 95) return R.raw._95;
-        if (meter > 95 && meter <= 100) return R.raw._100;
-        if (meter > 100 && meter <= 150) return R.raw._150;
-        if (meter > 150 && meter <= 200) return R.raw._200;
-
-        if (meter > 200 && meter <= 250) return R.raw._250;
-        if (meter > 250 && meter <= 300) return R.raw._300;
-        if (meter > 300 && meter <= 350) return R.raw._350;
-        if (meter > 350 && meter <= 400) return R.raw._400;
-        if (meter > 400 && meter <= 450) return R.raw._450;
-        if (meter > 450 && meter <= 500) return R.raw._500;
-        if (meter > 500 && meter <= 550) return R.raw._550;
-        if (meter > 550 && meter <= 600) return R.raw._600;
-        if (meter > 600 && meter <= 650) return R.raw._650;
-        if (meter > 650 && meter <= 700) return R.raw._700;
-        if (meter > 700 && meter <= 750) return R.raw._750;
-        if (meter > 750 && meter <= 800) return R.raw._800;
-        if (meter > 800 && meter <= 850) return R.raw._850;
-        if (meter > 850 && meter <= 900) return R.raw._900;
-
-        if (meter > 900 && meter <= 1000) return R.raw._1000;
-        if (meter > 1000 && meter <= 2000) return R.raw._2000;
-        if (meter > 2000 && meter <= 3000) return R.raw._3000;
-        if (meter > 3000 && meter <= 4000) return R.raw._4000;
-        if (meter > 4000 && meter <= 5000) return R.raw._5000;
-        if (meter > 5000 && meter <= 6000) return R.raw._6000;
-        if (meter > 6000 && meter <= 7000) return R.raw._7000;
-        if (meter > 7000 && meter <= 8000) return R.raw._8000;
-        if (meter > 8000 && meter <= 9000) return R.raw._9000;
-
-
-        return R.raw._1;
     }
 
     VoiceFlags voiceFlags;
@@ -1513,14 +1434,14 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         else if (lastRouteResponce.getInstructions().get(0).getDistance() <= 100 && lastRouteResponce.getInstructions().get(0).getDistance() > 10 && !voiceFlags.over10m) {
             voiceList = new ArrayList<Integer>();
             voiceList.add(R.raw.after);
-            voiceList.add(getVoiceId((int) (lastRouteResponce.getInstructions().get(0).getDistance())));
+            voiceList.add(VoiceInstructions.getVoiceId((int) (lastRouteResponce.getInstructions().get(0).getDistance())));
             voiceList.add(R.raw.meters);
-            voiceList.add(getVoiceFromSign(lastRouteResponce.getInstructions().get(1).getSign()));
+            voiceList.add(VoiceInstructions.getVoiceFromSign(lastRouteResponce.getInstructions().get(1).getSign()));
             voiceFlags.over10m=true;
         }
         else if (lastRouteResponce.getInstructions().get(0).getDistance() <= 10 && !voiceFlags.under10m) {
             voiceList = new ArrayList<Integer>();
-            voiceList.add(getVoiceFromSign(lastRouteResponce.getInstructions().get(1).getSign()));
+            voiceList.add(VoiceInstructions.getVoiceFromSign(lastRouteResponce.getInstructions().get(1).getSign()));
             voiceFlags.under10m=true;
         }
 
@@ -1589,58 +1510,10 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
     }
 
-    public void calculateAndShowFair(Taximeter taximeter) {
-        new AlertDialog.Builder(context)
-                .setTitle("محاسبه هزینه")
-                .setMessage("مدت زمان سپری شده" + " : " + convertSecToStr(taximeter.timer) + "\n" +
-                        " مسافت " + " : " + taximeter.getRouteDistance())
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // continue with delete
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
 
-    public double distance(LatLong start,LatLong end){
-        int R = 6371; // km
-        double x = (end.longitude - start.longitude) * Math.cos((start.latitude + end.latitude) / 2);
-        double y = (end.latitude - start.latitude);
-        return  Math.sqrt(x * x + y * y) * R;
-    }
 
-   /* public Instruction getMinDistanceBetweenPointAndInstructionList(InstructionList instructions,double gpsLat,double gpsLon){
 
-        Instruction minInstruction=null;
-        Point minPoint=null;
-        double minDistanc=-1;
 
-       for(Instruction instruction : instructions){
-           for (int i = 0; i < instruction.getPoints().size(); i++) {
-             double lat = instruction.getPoints().getLatitude(i);
-             double lon = instruction.getPoints().getLatitude(i);
-             double distance = distance(new LatLong(gpsLat,gpsLon),new LatLong(lat,lon));
-             if (distance<minDistanc){
-                 minDistanc=distance;
-                 minInstruction = instruction;
-             }
-
-           }
-       }
-        return minInstruction;
-    }*/
-
-    public void startConnectionService(){
-        Intent intent = new Intent(this, ConnectionService.class);
-        startService(intent);
-
-    }
 
 
 
@@ -1650,11 +1523,33 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         @Override
         public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
         {
+            final Task task = ((Task) intent.getSerializableExtra("TASK"));
+            new AlertDialog.Builder(context)
+                    .setTitle("ماموریت جدید دریافت شد")
+                    .setMessage("fromlat:"+task.getFromLat()+"\n"+"fromlon:"+task.getFromLon()+"\n"+"tolat:"+task.getToLat()+"\n"+"tolon:"+task.getToLat()+"\n"+"description:"+task.getDescription()+"\n"+"\n"+"date:"+task.getDate())
+                    .setPositiveButton("قبول و مسیریابی", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // continue with delete
+                            shortestPathRunning = true;
+                            isInRoutingMode = true;
 
-            handelNewRweceivedTask((Task) intent.getSerializableExtra("TASK"));
+                            if (voiceFlags!=null)
+                                voiceFlags.clear();
+
+                            calcPath(lastKnowLocation.latitude, lastKnowLocation.longitude,task.getToLat(),task.getToLon());
+                        }
+                    })
+                    .setNegativeButton("رد", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+
+
         }
     }
-
     // - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - -
     public class ConnectionStatusReceiver extends BroadcastReceiver
     {
@@ -1678,30 +1573,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
     }
     // - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - -
 
-    private void handelNewRweceivedTask(final Task task) {
-        new AlertDialog.Builder(this)
-                .setTitle("ماموریت جدید دریافت شد")
-                .setMessage("fromlat:"+task.getFromLat()+"\n"+"fromlon:"+task.getFromLon()+"\n"+"tolat:"+task.getToLat()+"\n"+"tolon:"+task.getToLat()+"\n"+"description:"+task.getDescription()+"\n"+"\n"+"date:"+task.getDate())
-                .setPositiveButton("قبول و مسیریابی", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // continue with delete
-                        shortestPathRunning = true;
-                        isInRoutingMode = true;
-
-                        if (voiceFlags!=null)
-                            voiceFlags.clear();
-
-                        calcPath(lastKnowLocation.latitude, lastKnowLocation.longitude,task.getToLat(),task.getToLon());
-                    }
-                })
-                .setNegativeButton("رد", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
 
     @Override
     protected void onResume() {
