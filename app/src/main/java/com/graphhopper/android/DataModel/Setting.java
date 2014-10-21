@@ -1,25 +1,31 @@
 /*
+
+
 package com.graphhopper.android.DataModel;
 
+
 import android.content.Context;
+import android.content.SharedPreferences;
 
-
-import java.util.Set;
 
 */
 /**
  * Created by aliparsa on 10/11/2014.
  *//*
 
+
+
 public class Setting {
-    public final String ON="on";
-    public final String OFF="off";
-    public final String TAXIMETER="taximeter";
-    public final String VOICE="voice";
+    public final String ON="ON";
+    public final String OFF="OFF";
+    public final String TAXIMETER="TAXIMETER";
+    public final String VOICE_INSTRUCTION="VOICE_INSTRUCTION";
+    public final String TEXT_INSTRUCTION="TEXT_INSTRUCTION";
 
     public static String voice;
     public static String taximeter;
-    private final SharedPreference sharedPreference;
+    SharedPreferences sharedPreferences;
+    private final Sha sharedPreference;
     Context context;
 
     public Setting(Context context){
@@ -31,24 +37,28 @@ public class Setting {
 
     private void loadSetting(){
 
-        if (!sharedPreference.contains(VOICE))
-            sharedPreference.putString(VOICE,OFF);
+
+        if (!sharedPreference.contains(VOICE_INSTRUCTION))
+            sharedPreference.putString(VOICE_INSTRUCTION,OFF);
         else
-            Setting.voice=sharedPreference.getString(VOICE,OFF);
+            Setting.voice=sharedPreference.getString(VOICE_INSTRUCTION,OFF);
+
 
 
         if (!sharedPreference.contains(TAXIMETER))
             sharedPreference.putString(TAXIMETER,OFF);
         else
             Setting.taximeter=sharedPreference.getString(TAXIMETER,OFF);
+
+
     }
 
     public void setVoiceRoutingOn(){
-        sharedPreference.putString(VOICE,ON);
+        sharedPreference.putString(VOICE_INSTRUCTION,ON);
     }
 
     public void setVoiceRoutingOff(){
-        sharedPreference.putString(VOICE,OFF);
+        sharedPreference.putString(VOICE_INSTRUCTION,OFF);
     }
 
     public void setTaximeterOn(){
@@ -60,7 +70,7 @@ public class Setting {
     }
 
     public String getVoiceRoutingStatus(){
-        return sharedPreference.getString(VOICE,OFF);
+        return sharedPreference.getString(VOICE_INSTRUCTION,OFF);
     }
 
     public String getTaximeterStatus(){
@@ -68,4 +78,5 @@ public class Setting {
     }
 
 }
+
 */

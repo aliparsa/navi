@@ -1,268 +1,404 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
-
-    <LinearLayout
-        android:id="@+id/llConfig"
-        android:visibility="gone"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
 
 
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="100dp"
-        android:visibility="gone"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/welcome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Welcome to GraphHopper!"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="100dp"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:text="Local" />
-
-        <Spinner
-            android:id="@+id/locale_area_spinner"
-            android:layout_width="180dp"
-            android:layout_height="60dp"
-            android:layout_weight="0.80" />
-
-        <Button
-            android:id="@+id/locale_button"
-            android:layout_width="86dp"
-            android:layout_height="60dp"
-            android:text="OK" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll"
-        android:layout_width="fill_parent"
-        android:layout_height="100dp"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:text="Remote" />
-
-        <Spinner
-            android:id="@+id/remote_area_spinner"
-            android:layout_width="180dp"
-            android:layout_height="60dp"
-            android:layout_weight="0.80" />
-
-        <Button
-            android:id="@+id/remote_button"
-            android:layout_width="86dp"
-            android:layout_height="60dp"
-            android:text="Download" />
-    </LinearLayout>
-
-    </LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent">
 
     <RelativeLayout
         android:id="@+id/llMap2"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_width="500dp"
+
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/horizontalScrollView"
+
+        android:layout_toLeftOf="@+id/scrollView2"
+        android:layout_toRightOf="@+id/scrollView4">
 
 
         <RelativeLayout
             android:id="@+id/llControls"
-            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:padding="5dp"
             android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
-
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:id="@+id/imageView"
-                android:src="@drawable/location"
-                android:padding="3dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:id="@+id/imageView3"
-                android:src="@drawable/routing"
-                android:paddingLeft="10dp"
-                android:layout_alignParentBottom="true"
-                android:layout_toRightOf="@id/imageView"
-                 />
-
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:id="@+id/imageView4"
-                android:src="@drawable/settings"
-                android:alpha="0.8"
-                android:paddingLeft="10dp"
-                android:layout_alignParentBottom="true"
-                android:layout_toRightOf="@id/imageView3"
-                />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="80dp"
-                android:layout_alignBottom="@+id/imageView4"
-                android:layout_toRightOf="@+id/imageView4">
-
-                <Button
-                    android:id="@+id/taximeter1"
-                    android:layout_width="120dp"
-                    android:layout_height="80dp"
-                    android:background="#ccffef34"
-                    android:padding="5dp"
-                    android:layout_margin="5dp"
-                    android:textSize="20dp"
-                    android:text="شروع تاکسی متر"/>
-
-                <Button
-                    android:id="@+id/taximeter2"
-                    android:layout_width="120dp"
-                    android:layout_height="80dp"
-                    android:background="#ccffef34"
-                    android:padding="5dp"
-                    android:layout_margin="5dp"
-                    android:textSize="20dp"
-
-                    android:text="شروع تاکسی متر"/>
-
-                <Button
-                    android:id="@+id/taximeter3"
-                    android:layout_width="120dp"
-                    android:layout_height="80dp"
-                    android:background="#ccffef34"
-                    android:padding="5dp"
-                    android:layout_margin="5dp"
-                    android:textSize="20dp"
-
-                    android:text="شروع تاکسی متر"/>
-
-                <Button
-                    android:id="@+id/taximeter4"
-                    android:layout_width="120dp"
-                    android:layout_height="80dp"
-                    android:background="#ccffef34"
-                    android:padding="5dp"
-                    android:layout_margin="5dp"
-                    android:textSize="20dp"
-
-                    android:text="شروع تاکسی متر"/>
-
-
-            </LinearLayout>
-
-
-
-
-
-            <LinearLayout
-
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:gravity="center_vertical"
-                android:layout_alignParentEnd="true"
-                android:id="@+id/relativeLayout"
-                android:layout_alignParentBottom="true">
-
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="N/A"
-                    android:id="@+id/satlate_in_view"
-
-                    android:layout_alignTop="@+id/relativeLayout"
-                    android:layout_toLeftOf="@+id/relativeLayout" />
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:id="@+id/imageView2"
-                    android:src="@drawable/satlate"
-                    android:scaleType="fitCenter"
-                    />
-
-            </LinearLayout>
-
+            android:layout_alignParentStart="true"
+            android:orientation="horizontal"
+            android:padding="3dp">
 
 
             <ImageView
+                android:id="@+id/imageView6"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:id="@+id/imageView6"
-                android:src="@drawable/compas"
-                android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/compas" />
 
             <TextView
-                android:visibility="gone"
+                android:id="@+id/log"
                 android:layout_width="170dp"
                 android:layout_height="fill_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:background="#aad1d0d2"
-                android:textColor="#ff000000"
-                android:scrollbars="vertical"
-                android:textSize="10dp"
-
-                android:id="@+id/log"
                 android:gravity="bottom"
 
-                android:layout_alignBottom="@+id/imageView4"
+                android:scrollbars="vertical"
+                android:textColor="#ff000000"
+
+                android:textSize="10dp"
+                android:visibility="gone" />
+
+
+            <ScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="280dp"
+                android:layout_height="wrap_content"
+                android:background="#aa979797"
+                android:layout_alignTop="@+id/imageView6"
                 android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignParentEnd="true">
 
-
-
-
-                <ScrollView
-                    android:background="#aa979797"
-                    android:layout_width="300dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true">
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:id="@+id/directionList"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        </LinearLayout>
-                    </ScrollView>
-
+                <LinearLayout
+                    android:id="@+id/directionList"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"></LinearLayout>
+            </ScrollView>
 
 
         </RelativeLayout>
 
     </RelativeLayout>
 
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="100dp"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/horizontalScrollView"
+        android:layout_alignParentEnd="true"
+
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="#fffffdab">
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:orientation="vertical">
+
+
+            <Button
+            android:id="@+id/btnSample1"
+            android:layout_width="fill_parent"
+            android:layout_height="85dp"
+            android:text="Speed\n36Km" />
+
+            <Button
+                android:id="@+id/btnSample2"
+                android:layout_width="fill_parent"
+                android:layout_height="85dp"
+                android:text="Distance\n112Km" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:layout_alignBottom="@+id/imageView4"
+                android:layout_toRightOf="@+id/imageView4"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/taximeter1"
+                    android:layout_width="95dp"
+                    android:layout_height="95dp"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/taximeter"
+                    android:textSize="20dp"
+
+                    />
+
+                <Button
+                    android:id="@+id/taximeter2"
+                    android:layout_width="95dp"
+                    android:layout_height="95dp"
+
+                    android:layout_margin="5dp"
+                    android:background="@drawable/taximeter"
+                    android:textSize="20dp"
+
+                    />
+
+                <Button
+                    android:id="@+id/taximeter3"
+                    android:layout_width="95dp"
+                    android:layout_height="95dp"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/taximeter"
+                    android:textSize="20dp"
+
+                    />
+
+                <Button
+                    android:id="@+id/taximeter4"
+                    android:layout_width="95dp"
+                    android:layout_height="95dp"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/taximeter"
+                    android:textSize="20dp"
+
+                    />
+
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Button"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Button"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Button"
+                android:visibility="gone" />
+
+
+
+
+
+
+
+            <Button
+                android:id="@+id/btnStopRouting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stop Routing"
+                android:visibility="gone" />
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ScrollView
+        android:id="@+id/scrollView4"
+        android:layout_width="80dp"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/horizontalScrollView"
+        android:background="#ffffff8f" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+            <Button
+                android:id="@+id/button6"
+                android:layout_width="fill_parent"
+                android:layout_height="85dp"
+                android:text="Search POI" />
+
+            <Button
+                android:id="@+id/btnLocationManagement"
+                android:layout_width="fill_parent"
+                android:layout_height="85dp"
+                android:text="Location Manager" />
+
+            </LinearLayout>
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/horizontalScrollView"
+        android:layout_width="fill_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="#fffff6a8" >
+
+
+
+        <LinearLayout
+
+            android:id="@+id/relativeLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+
+            <Button
+                android:id="@+id/btnGpsStatus"
+                android:layout_width="40dp"
+                android:layout_height="fill_parent"
+                android:background="@android:color/darker_gray"
+                android:text="GPS" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:background="#FF0000FF" />
+
+            <Button
+                android:id="@+id/btnSrvStatus"
+                android:layout_width="40dp"
+                android:layout_height="fill_parent"
+                android:background="@android:color/darker_gray"
+                android:text="مرکز" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:background="#FF0000FF" />
+
+            <Button
+                android:id="@+id/btnBtrStatus"
+                android:layout_width="40dp"
+                android:layout_height="fill_parent"
+                android:background="@android:color/darker_gray"
+                android:text="باتری" />
+            <View
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:background="#FF0000FF" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <Button
+                android:id="@+id/btnPinOnGps"
+                android:layout_width="@dimen/bottom_bar_button_width"
+                android:layout_height="fill_parent"
+                android:text="PinGPS" />
+            <Button
+                android:id="@+id/btnSetting"
+                android:layout_width="@dimen/bottom_bar_button_width"
+                android:layout_height="fill_parent"
+                android:text="Setting" />
+
+
+            <Button
+                android:id="@+id/btnMessaging"
+                android:layout_width="@dimen/bottom_bar_button_width"
+                android:layout_height="fill_parent"
+                android:text="Msg" />
+
+
+
+            <Button
+                android:id="@+id/btnFuelManagement"
+                android:layout_width="@dimen/bottom_bar_button_width"
+                android:layout_height="fill_parent"
+                android:text="Fuel" />
+
+            <Button
+                android:id="@+id/btnSos"
+                android:layout_width="@dimen/bottom_bar_button_width"
+                android:layout_height="fill_parent"
+                android:text="SOS"
+                android:textColor="#ffff0021" />
+
+        </LinearLayout>
+    </RelativeLayout>
+
+
+
+<LinearLayout
+android:id="@+id/llConfig"
+android:visibility="gone"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical">
+
+
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="100dp"
+    android:visibility="gone"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to GraphHopper!"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 </LinearLayout>
+
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="100dp"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="Local" />
+
+    <Spinner
+        android:id="@+id/locale_area_spinner"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:layout_weight="0.80" />
+
+    <Button
+        android:id="@+id/locale_button"
+        android:layout_width="86dp"
+        android:layout_height="60dp"
+        android:text="OK" />
+
+</LinearLayout>
+
+<LinearLayout
+    android:id="@+id/ll"
+    android:layout_width="fill_parent"
+    android:layout_height="100dp"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="Remote" />
+
+    <Spinner
+        android:id="@+id/remote_area_spinner"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:layout_weight="0.80" />
+
+    <Button
+        android:id="@+id/remote_button"
+        android:layout_width="86dp"
+        android:layout_height="60dp"
+        android:text="Download" />
+</LinearLayout>
+
+</LinearLayout>
+
+</RelativeLayout>

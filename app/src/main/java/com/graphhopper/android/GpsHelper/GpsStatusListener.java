@@ -12,10 +12,10 @@ import java.util.Iterator;
 public class GpsStatusListener implements GpsStatus.Listener {
 
     private LocationManager locationManager;
-    private int satlateInView=0;
-    private int satlateInUse=0;
+    private int satlateInView = 0;
+    private int satlateInUse = 0;
 
-    public GpsStatusListener (LocationManager locationManager){
+    public GpsStatusListener(LocationManager locationManager) {
 
         this.locationManager = locationManager;
     }
@@ -23,11 +23,11 @@ public class GpsStatusListener implements GpsStatus.Listener {
     @Override
     public void onGpsStatusChanged(int i) {
         GpsStatus gpsStatus = locationManager.getGpsStatus(null);
-        if(gpsStatus != null) {
-            Iterable<GpsSatellite>satellites = gpsStatus.getSatellites();
+        if (gpsStatus != null) {
+            Iterable<GpsSatellite> satellites = gpsStatus.getSatellites();
             Iterator<GpsSatellite> sat = satellites.iterator();
-            int satlateInView=0;
-            int satlateInUse=0;
+            int satlateInView = 0;
+            int satlateInUse = 0;
 
             if (satellites != null) {
                 for (GpsSatellite gpsSatellite : satellites) {
@@ -36,9 +36,9 @@ public class GpsStatusListener implements GpsStatus.Listener {
                         satlateInUse++;
                     }
                 }
+            }
         }
     }
-}
 
     public int getSatlateInView() {
         return satlateInView;

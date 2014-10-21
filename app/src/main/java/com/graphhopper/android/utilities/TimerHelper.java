@@ -9,7 +9,7 @@ import java.util.TimerTask;
 public class TimerHelper {
 
 
-    public static void timerFactory(int milisec, int count, final TimerFunction function){
+    public static void timerFactory(int milisec, int count, final TimerFunction function) {
 
         //Declare the timer
         Timer t = new Timer();
@@ -27,7 +27,7 @@ public class TimerHelper {
     }
 
 
-    public interface TimerFunction{
+    public interface TimerFunction {
 
         public void tick();
 

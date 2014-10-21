@@ -1,45 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.graphhopper.android"
-          android:versionCode="1"
-          android:versionName="0.1"
-    >
+    package="com.graphhopper.android"
+    android:versionCode="1"
+    android:versionName="0.1" >
 
-    <!-- mapsforge cache and saving maps -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
-    <!-- necessary to easily download maps via wifi -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
-
-
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="hidebar.permission.CONTROL_SYSTEMBAR" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="19" />
 
     <application
-
         android:allowBackup="true"
         android:icon="@drawable/logo"
-        android:label="@string/app_name"        
+        android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        
+        <receiver android:name=".AutoStarters.autoStartLocationFinder" >
+            <intent-filter>
+                <action android:name="LOCATION_FINDER" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".AutoStarters.autoStartLocationSender" >
+            <intent-filter>
+                <action android:name="LOCATION_SENDER" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".AutoStarters.autoStartOnBootComplete" >
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.BOOT_COMPLETED"
+                    android:enabled="true"
+                    android:exported="true" />
+            </intent-filter>
+        </receiver>
         <activity
-            android:name=".MainActivity"
-            android:label="@string/title_activity_main" 
-
-            android:screenOrientation="landscape"
-
-            >
+            android:name=".Activities.MainActivity"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+
+                <action android:name="CONNECTION_SERVICE_INTENT" />
+                <action android:name="CONNECTION_STATUS" />
             </intent-filter>
+        </activity>
+        <service
+            android:name=".Services.ConnectionService"
+            android:enabled="true" />
+        <service
+            android:name=".Services.LocationFinderService"
+            android:enabled="true" />
+        <service
+            android:name=".Services.LocationSenderService"
+            android:enabled="true" />
+        <activity
+            android:name=".Activities.SettingActivity"
+            android:label="@string/title_activity_setting"
+            android:parentActivityName=".Activities.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.graphhopper.android.Activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".Activities.MessagingActivity"
+            android:label="@string/title_activity_messaging" >
         </activity>
     </application>
 

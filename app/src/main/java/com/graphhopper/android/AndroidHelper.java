@@ -10,28 +10,22 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-public class AndroidHelper
-{
-    public static List<String> readFile( Reader simpleReader ) throws IOException
-    {
+public class AndroidHelper {
+    public static List<String> readFile(Reader simpleReader) throws IOException {
         BufferedReader reader = new BufferedReader(simpleReader);
-        try
-        {
+        try {
             List<String> res = new ArrayList<String>();
             String line;
-            while ((line = reader.readLine()) != null)
-            {
+            while ((line = reader.readLine()) != null) {
                 res.add(line);
             }
             return res;
-        } finally
-        {
+        } finally {
             reader.close();
         }
     }
 
-    public static boolean isFastDownload( Context ctx )
-    {
+    public static boolean isFastDownload(Context ctx) {
         ConnectivityManager mgrConn = (ConnectivityManager) ctx
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         return mgrConn.getActiveNetworkInfo() != null
@@ -41,11 +35,9 @@ public class AndroidHelper
         // || mgrTel.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS) {
     }
 
-    public static String getFileName( String str )
-    {
+    public static String getFileName(String str) {
         int index = str.lastIndexOf("/");
-        if (index > 0)
-        {
+        if (index > 0) {
             return str.substring(index + 1);
         }
         return str;
