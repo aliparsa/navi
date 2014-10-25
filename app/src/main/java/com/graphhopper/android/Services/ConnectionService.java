@@ -70,7 +70,9 @@ public class ConnectionService extends Service {
 
                     try {
                         JSONObject obj = (JSONObject) args[0];
+                        String StrJsonObject  = (String) args[0];
                         broadcastObject(obj);
+                        broadcast(StrJsonObject);
                         Log.i("ashkan", "socket new message news recieved");
 
                         //sendNotification("hello", obj.getString("hello"));
@@ -193,6 +195,19 @@ public class ConnectionService extends Service {
             Intent intent = new Intent(CONNECTION_SERVICE_INTENT);
             intent.putExtra("TASK", new Task(obj.getDouble("fromLat"), obj.getDouble("fromLon"), obj.getDouble("toLat"), obj.getDouble("toLon"),obj.getString("description"),obj.getString("date")));
             sendBroadcast(intent);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void broadcast(String obj)//this method sends broadcast messages
+    {
+        try {
+
+            Intent intent = new Intent("MESSAGE");
+            intent.putExtra("MESSAGE", obj);
+            sendBroadcast(intent);
+
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -1,4 +1,4 @@
-package com.graphhopper.android.GpsHelper;
+package com.graphhopper.android.Listeners;
 
 import android.location.GpsSatellite;
 import android.location.GpsStatus;

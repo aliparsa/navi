@@ -1,11 +1,19 @@
-package com.graphhopper.android.Routing;
+package com.graphhopper.android.Helpers;
 
+import android.content.Context;
+import android.media.MediaPlayer;
+
+import com.graphhopper.GHResponse;
+import com.graphhopper.android.DataModel.VoiceFlags;
 import com.graphhopper.android.R;
+import com.graphhopper.util.Instruction;
+
+import java.util.ArrayList;
 
 /**
  * Created by aliparsa on 10/21/2014.
  */
-public class VoiceInstructions {
+public class VoiceInstructionsHelper {
 
     public static int getVoiceFromSign(int sign) {
         switch (sign) {
@@ -100,5 +108,66 @@ public class VoiceInstructions {
 
 
         return R.raw._1;
+    }
+
+    public static void playVoiceList(final Context context,final ArrayList<Integer> voiceList) {
+
+        if (voiceList == null) return;
+
+        if (voiceList.size() > 0) {
+            int voiceId = voiceList.get(0);
+            voiceList.remove(0);
+
+            MediaPlayer mediaPlayer = MediaPlayer.create(context, voiceId);
+            mediaPlayer.getDuration();
+
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.release();
+                    playVoiceList(context,voiceList);
+                }
+            });
+            mediaPlayer.start();
+
+        }
+
+    }
+
+    public static void createAndPlayVoiceCommand(Context context,GHResponse lastRouteResponce,VoiceFlags voiceFlags) {
+
+        Instruction instruction = lastRouteResponce.getInstructions().get(1);
+
+        if (voiceFlags == null)
+            voiceFlags = new VoiceFlags(instruction);
+
+        voiceFlags.calculate(instruction);
+
+
+        ArrayList<Integer> voiceList = null;
+
+        if (lastRouteResponce.getDistance() < 10 && !voiceFlags.reachedDestination) {
+            voiceList = new ArrayList<Integer>();
+            voiceList.add(R.raw.reached_destination);
+            voiceFlags.reachedDestination = true;
+        } else if (lastRouteResponce.getInstructions().get(0).getDistance() > 100 && !voiceFlags.over100m) {
+            voiceList = new ArrayList<Integer>();
+            voiceList.add(R.raw.go_ahead);
+            voiceFlags.over100m = true;
+        } else if (lastRouteResponce.getInstructions().get(0).getDistance() <= 100 && lastRouteResponce.getInstructions().get(0).getDistance() > 10 && !voiceFlags.over10m) {
+            voiceList = new ArrayList<Integer>();
+            voiceList.add(R.raw.after);
+            voiceList.add(VoiceInstructionsHelper.getVoiceId((int) (lastRouteResponce.getInstructions().get(0).getDistance())));
+            voiceList.add(R.raw.meters);
+            voiceList.add(VoiceInstructionsHelper.getVoiceFromSign(lastRouteResponce.getInstructions().get(1).getSign()));
+            voiceFlags.over10m = true;
+        } else if (lastRouteResponce.getInstructions().get(0).getDistance() <= 10 && !voiceFlags.under10m) {
+            voiceList = new ArrayList<Integer>();
+            voiceList.add(VoiceInstructionsHelper.getVoiceFromSign(lastRouteResponce.getInstructions().get(1).getSign()));
+            voiceFlags.under10m = true;
+        }
+
+        VoiceInstructionsHelper.playVoiceList(context, voiceList);
     }
 }

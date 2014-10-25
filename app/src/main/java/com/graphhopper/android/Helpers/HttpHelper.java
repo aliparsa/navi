@@ -1,5 +1,5 @@
 
-package com.graphhopper.android.utilities;
+package com.graphhopper.android.Helpers;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;

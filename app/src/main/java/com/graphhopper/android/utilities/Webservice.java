@@ -6,6 +6,7 @@ import android.util.Log;
 
 
 import com.graphhopper.android.DataModel.ServerResponse;
+import com.graphhopper.android.Helpers.HttpHelper;
 import com.graphhopper.android.Interfaces.CallBack;
 import com.graphhopper.android.Interfaces.ResponseHandler;
 

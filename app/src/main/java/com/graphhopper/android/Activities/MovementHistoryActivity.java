@@ -4,22 +4,32 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 
 import com.graphhopper.android.R;
 
-public class SettingActivity extends Activity {
+import org.mapsforge.map.android.view.MapView;
+
+public class MovementHistoryActivity extends Activity {
+
+    private MapView mapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setting);
+        setContentView(R.layout.activity_movement_history);
+
+        mapView = new MapView(this);
+        mapView.setClickable(true);
+        mapView.setBuiltInZoomControls(true);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.setting, menu);
+        getMenuInflater().inflate(R.menu.movement_history, menu);
         return true;
     }
 

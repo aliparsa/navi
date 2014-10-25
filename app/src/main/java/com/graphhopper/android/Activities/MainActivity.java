@@ -1,32 +1,5 @@
 package com.graphhopper.android.Activities;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.TreeMap;
-
-import org.mapsforge.core.graphics.Bitmap;
-import org.mapsforge.core.graphics.Paint;
-import org.mapsforge.core.graphics.Style;
-import org.mapsforge.core.model.LatLong;
-import org.mapsforge.core.model.MapPosition;
-import org.mapsforge.core.model.Point;
-import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
-import org.mapsforge.map.android.rendertheme.AssetsRenderTheme;
-import org.mapsforge.map.android.util.AndroidUtil;
-import org.mapsforge.map.android.view.MapView;
-import org.mapsforge.map.layer.Layers;
-import org.mapsforge.map.layer.cache.TileCache;
-import org.mapsforge.map.layer.overlay.Marker;
-import org.mapsforge.map.layer.overlay.Polyline;
-import org.mapsforge.map.layer.renderer.TileRendererLayer;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -40,31 +13,25 @@ import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.InputType;
+import android.text.format.Time;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.view.animation.AnimationSet;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.RotateAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -75,34 +42,98 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
-import com.graphhopper.android.AndroidHelper;
+import com.graphhopper.android.DataModel.Message;
 import com.graphhopper.android.DataModel.Task;
 import com.graphhopper.android.DataModel.Taximeter;
 import com.graphhopper.android.DataModel.VoiceFlags;
 import com.graphhopper.android.GHAsyncTask;
-import com.graphhopper.android.GpsHelper.GpsStatusListener;
+import com.graphhopper.android.Helpers.AndroidHelper;
+import com.graphhopper.android.Helpers.BattryHelper;
+import com.graphhopper.android.Helpers.DatabaseHelper;
+
+import com.graphhopper.android.Helpers.DrawOnMapHelper;
 import com.graphhopper.android.Helpers.GpsHelper;
 import com.graphhopper.android.Helpers.MapViewHelper;
 import com.graphhopper.android.Helpers.ServiceHelper;
 import com.graphhopper.android.Helpers.TaximeterHelper;
+import com.graphhopper.android.Helpers.TextInstructionsHelper;
 import com.graphhopper.android.Helpers.TimeHelper;
+import com.graphhopper.android.Helpers.TimerHelper;
+import com.graphhopper.android.Helpers.VoiceInstructionsHelper;
+import com.graphhopper.android.Listeners.GpsStatusListener;
+import com.graphhopper.android.Listeners.GpsStatusListener2;
+import com.graphhopper.android.Listeners.SensorListener;
 import com.graphhopper.android.R;
-import com.graphhopper.android.Routing.VoiceInstructions;
 import com.graphhopper.android.Services.ConnectionService;
-import com.graphhopper.android.utilities.TimerHelper;
+import com.graphhopper.android.utilities.PersianCalender;
 import com.graphhopper.util.Constants;
 import com.graphhopper.util.Downloader;
 import com.graphhopper.util.Helper;
-import com.graphhopper.util.Instruction;
-import com.graphhopper.util.PointList;
 import com.graphhopper.util.ProgressListener;
 import com.graphhopper.util.StopWatch;
 
-public class MainActivity extends Activity implements GpsStatus.Listener, SensorEventListener {
+import org.json.JSONObject;
+import org.mapsforge.core.graphics.Bitmap;
+import org.mapsforge.core.model.LatLong;
+import org.mapsforge.core.model.MapPosition;
+import org.mapsforge.core.model.Point;
+import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
+import org.mapsforge.map.android.rendertheme.AssetsRenderTheme;
+import org.mapsforge.map.android.util.AndroidUtil;
+import org.mapsforge.map.android.view.MapView;
+import org.mapsforge.map.layer.Layers;
+import org.mapsforge.map.layer.cache.TileCache;
+import org.mapsforge.map.layer.overlay.Marker;
+import org.mapsforge.map.layer.renderer.TileRendererLayer;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+public class MainActivity extends Activity {
+    private static final int NEW_MENU_ID = Menu.FIRST + 1;
+    public static Context context;
+    public boolean isInRoutingMode = false;
+    public boolean newLocationEventInProgress;
+    public Location loc_lastKnowLocation;
+    LocationManager locationManager;
+    ImageView img2;
+    //ImageView img4;
+    TileRendererLayer tileRendererLayer;
+    GHResponse lastRouteResponce;
+    SensorManager mSensorManager;
+    Sensor mCompass;
+    TextView log;
+    Button btn_taximeter1;
+    Button btn_taximeter2;
+    Button btn_taximeter3;
+    Button btn_taximeter4;
+    Taximeter taximeter1;
+    Taximeter taximeter2;
+    Taximeter taximeter3;
+    Taximeter taximeter4;
+    LinearLayout llDirectionList;
+    Button btn1;
+    Button btn2;
+    Button btn3;
+    Button btnGpsStatus;
+    Button btnSrvStatus;
+    Button btnBtrStatus;
+    Button btnSos;
+    Button btnStopRouting;
+    Button btnSetting;
+    Button btnMessaging;
+    Button btnPinOnGps;
+    VoiceFlags voiceFlags;
     private MapView mapView;
     private GraphHopper hopper;
     private LatLong start;
@@ -114,83 +145,126 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
     private volatile boolean prepareInProgress = false;
     private volatile boolean shortestPathRunning = false;
     private String currentArea = "berlin";
+
+
+    //Setting setting;
     private String fileListURL = "https://graphhopper.com/public/maps/0.3/";
     private String prefixURL = fileListURL;
     private String downloadURL;
     private File mapsFolder;
     private TileCache tileCache;
-
     // my fields
     private LatLong lastKnowLocation;
-    private boolean lockOnGps = true;
-    public static Context context;
+    private boolean lockOnGps = false;
     private GpsStatusListener gpsStatusListener;
-    LocationManager locationManager;
-
-    ImageView img2;
-    ImageView img4;
     private LatLong lastGPSLocation;
-    TileRendererLayer tileRendererLayer;
-    public boolean isInRoutingMode = false;
-    GHResponse lastRouteResponce;
+    private LocationListener listener = new LocationListener() {
 
-    SensorManager mSensorManager;
-    Sensor mCompass;
+
+        @Override
+        public void onLocationChanged(Location location) {
+
+            loc_lastKnowLocation = location;
+
+            updateGpsStateIcon(GpsState.connected);
+
+            updateSpeedValue(location);
+
+            updateDistanceValue(location);
+
+
+            // send location to store in taximeters
+            putLocationToActiveTaximeters(location);
+
+            if (newLocationEventInProgress) {
+                log.append("new location event ignored\n");
+                return;
+            }
+
+            newLocationEventInProgress = true;
+
+            try {
+
+                log.append("new lat lon\n");
+                // if we lock on gps we navigate to new position
+                if (lockOnGps)
+                    MapViewHelper.animateToPoint(mapView, location.getLatitude(), location.getLongitude());
+
+                // get last location
+                lastGPSLocation = new LatLong(location.getLatitude(), location.getLongitude());
+                lastKnowLocation = new LatLong(location.getLatitude(), location.getLongitude());
+
+
+                if (isInRoutingMode) {
+                    // we are in routing mode
+                    log.append("we are in routing mode\n");
+
+
+                    if (!isReady()) {
+                        log.append("no ready >ret\n");
+                        return;
+                    }
+
+                    if (shortestPathRunning) {
+                        log.append("route in running >ret\n");
+                        return;
+                    }
+
+                    shortestPathRunning = true;
+                    log.append("req new route from lat: " + location.getLatitude() + " lon: " + location.getLongitude() + " to lat: " + end.latitude + " lon: " + end.longitude + "\n");
+                    calcPath(location.getLatitude(), location.getLongitude(), end.latitude, end.longitude);
+
+                } else {
+                    // we are not in routing mode
+                    // show new current point on map
+                    log.append("NOT in routing mode\n");
+                    MapViewHelper.clearMapView(mapView);
+                    DrawOnMapHelper.showImgOnThisPoint(context, lastKnowLocation, mapView, R.drawable.blue_circle);
+                }
+
+
+            } catch (Exception e) {
+                logUser(e.getMessage());
+                newLocationEventInProgress = false;
+            }
+
+            newLocationEventInProgress = false;
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            btnGpsStatus.setBackgroundColor(Color.GRAY);
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            btnGpsStatus.setBackgroundColor(Color.YELLOW);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            //satlateInView.setText(gpsStatusListener.getSatlateInView()+"");
+
+
+        }
+    };
     private float lastAzimuth = 0;
-
-    TextView log;
-    public boolean newLocationEventInProgress;
-
-    Button btn_taximeter1;
-    Button btn_taximeter2;
-    Button btn_taximeter3;
-    Button btn_taximeter4;
-
-    Taximeter taximeter1;
-    Taximeter taximeter2;
-    Taximeter taximeter3;
-    Taximeter taximeter4;
-    private int oldDayOfYear=-1;
+    private int oldDayOfYear = -1;
     private Location oldLocation;
-    private double todayDistance=0;
-
-    public static enum GpsState{connected,disconnected};
-
-    public Location loc_lastKnowLocation;
-
-
-    //Setting setting;
-
-    LinearLayout llDirectionList;
+    private double todayDistance = 0;
+    private int layerCount = -1;
     private double LastRouteLat;
     private double LastRouteLon;
-    private int layerCount = -1;
-
-
-    Button btn1;
-    Button btn2;
-    Button btn3;
-
-    Button btnGpsStatus;
-    Button btnSrvStatus;
-    Button btnBtrStatus;
-    Button btnSos;
-    Button btnStopRouting;
-    Button btnSetting;
-    Button btnMessaging;
-    Button btnPinOnGps;
-
+    private boolean DuringShowHistory = false;
 
     protected boolean onMapTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
 
-
-        if (isInRoutingMode)
-        {
-            Location location = new Location("ali");
-            location.setLatitude(tapLatLong.latitude);
-            location.setLongitude(tapLatLong.longitude);
-            listener.onLocationChanged(location);
-        }
+//        if (isInRoutingMode) {
+//            Location location = new Location("ali");
+//            location.setLatitude(tapLatLong.latitude);
+//            location.setLongitude(tapLatLong.longitude);
+//            listener.onLocationChanged(location);
+//        }
 
         if (!isReady())
             return false;
@@ -202,23 +276,9 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         Layers layers = mapView.getLayerManager().getLayers();
 
 
-        //showSelectorDialog( );
+        showSelectorDialog(tapLatLong);
 
-        start = lastKnowLocation;
 
-        if (start != null) {
-
-            end = tapLatLong;
-            shortestPathRunning = true;
-            isInRoutingMode = true;
-
-            if (voiceFlags!=null)
-                voiceFlags.clear();
-
-            calcPath(start.latitude, start.longitude, end.latitude,
-                    end.longitude);
-
-        }
 
        /* else
         {
@@ -242,6 +302,81 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         return true;
     }
 
+    private void showSelectorDialog(final LatLong tapLatLong) {
+
+
+        AlertDialog.Builder adb = new AlertDialog.Builder(this);
+        CharSequence items[] = new CharSequence[]{"ذخیره", "مسیریابی به اینجا"};
+        adb.setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (i == 1) {
+                            dialogInterface.dismiss();
+                            start = lastKnowLocation;
+
+                            if (start != null) {
+
+                                end = tapLatLong;
+                                shortestPathRunning = true;
+                                isInRoutingMode = true;
+
+                                if (voiceFlags != null)
+                                    voiceFlags.clear();
+
+                                calcPath(start.latitude, start.longitude, end.latitude,
+                                        end.longitude);
+
+
+                            }
+                        }
+
+                        if (i == 0) {
+                            dialogInterface.dismiss();
+
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setTitle("نام این نقطه ؟");
+
+// Set up the input
+                            final EditText input = new EditText(context);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                            input.setInputType(InputType.TYPE_CLASS_TEXT);
+                            builder.setView(input);
+
+// Set up the buttons
+                            builder.setPositiveButton("ذخیره", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    DatabaseHelper db = new DatabaseHelper(context);
+                                    try {
+                                        db.insertPrivateLocation(tapLatLong, "2014-10-10", input.getText().toString());
+                                        showToast("با موفقیت ذخیره شد");
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        showToast("هنگان ذخیره سازی خطایی  رخ داد");
+                                    }
+
+
+                                }
+                            });
+                            builder.setNegativeButton("لغو", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                            builder.show();
+
+                        }
+
+                    }
+                }
+        );
+        adb.setTitle("کدام ؟");
+        adb.show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -255,7 +390,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         mapView = new MapView(this) {
             @Override
             public boolean onTouchEvent(MotionEvent motionEvent) {
-                //lockOnGps=false;
+                lockOnGps = false;
                 Log.i("ali", "> > > > > > > unlock");
                 return super.onTouchEvent(motionEvent);
 
@@ -415,37 +550,24 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mCompass = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-        mSensorManager.registerListener(this, mCompass, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(new SensorListener(), mCompass, SensorManager.SENSOR_DELAY_NORMAL);
 
 
-       // satlateInView = (TextView) findViewById(R.id.satlate_in_view);
+        // satlateInView = (TextView) findViewById(R.id.satlate_in_view);
 
-        img4 = (ImageView) findViewById(R.id.imageView6);
+        // img4 = (ImageView) findViewById(R.id.imageView6);
 
         btnPinOnGps = (Button) findViewById(R.id.btnPinOnGps);
         btnPinOnGps.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (lastKnowLocation != null) {
-                    lockOnGps = !lockOnGps;
+                    lockOnGps = true;
+                    MapViewHelper.animateToPoint(mapView, lastKnowLocation.latitude, lastKnowLocation.longitude);
 
-                    if (lockOnGps) {
-                        animateToPoint(lastKnowLocation.latitude, lastKnowLocation.longitude);
-                        Toast.makeText(context, "همیشه در مرکز نقشه هستید", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(context, "همیشه در مرکز غیر فعال شد", Toast.LENGTH_SHORT).show();
-
-                    }
                 }
-               /* else {
-                    Toast.makeText(context, "Position not defined yet", Toast.LENGTH_SHORT).show();
-                }*/
             }
         });
-
-
-
-
 
 
         locationManager = (LocationManager) getApplicationContext()
@@ -454,8 +576,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 3000, 1, listener);
 
-        locationManager.addGpsStatusListener(this);
-
+        locationManager.addGpsStatusListener(new GpsStatusListener2());
 
         //Toast.makeText(context,locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).toString(),Toast.LENGTH_SHORT).show();
 
@@ -478,25 +599,25 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                         if (taximeter1 != null) {
                             taximeter1.timer++;
                             btn_taximeter1.setText(TimeHelper.convertSecToStr(taximeter1.timer));
-                            btn_taximeter1.append("\n" + (int)taximeter1.getRouteDistance() + "M");
+                            btn_taximeter1.append("\n" + (int) taximeter1.getRouteDistance() + "M");
                         }
 
                         if (taximeter2 != null) {
                             taximeter2.timer++;
                             btn_taximeter2.setText(TimeHelper.convertSecToStr(taximeter2.timer));
-                            btn_taximeter2.append("\n" + (int)taximeter2.getRouteDistance() + "M");
+                            btn_taximeter2.append("\n" + (int) taximeter2.getRouteDistance() + "M");
 
                         }
                         if (taximeter3 != null) {
                             taximeter3.timer++;
                             btn_taximeter3.setText(TimeHelper.convertSecToStr(taximeter3.timer));
-                            btn_taximeter3.append("\n" +(int) taximeter3.getRouteDistance() + "M");
+                            btn_taximeter3.append("\n" + (int) taximeter3.getRouteDistance() + "M");
 
                         }
                         if (taximeter4 != null) {
                             taximeter4.timer++;
                             btn_taximeter4.setText(TimeHelper.convertSecToStr(taximeter4.timer));
-                            btn_taximeter4.append("\n" + (int)taximeter4.getRouteDistance() + "M");
+                            btn_taximeter4.append("\n" + (int) taximeter4.getRouteDistance() + "M");
 
                         }
 
@@ -510,9 +631,9 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
         localButton.callOnClick();
 
-         btn1 = (Button) findViewById(R.id.button);
-         btn2 = (Button) findViewById(R.id.button2);
-         btn3 = (Button) findViewById(R.id.button3);
+        btn1 = (Button) findViewById(R.id.button);
+        btn2 = (Button) findViewById(R.id.button2);
+        btn3 = (Button) findViewById(R.id.button3);
 
         btn1.setOnClickListener(new OnClickListener() {
             @Override
@@ -520,7 +641,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                 Location location = new Location("ali");
                 location.setLatitude(29.61747028);
                 location.setLongitude(52.52598551);
-               listener.onLocationChanged(location);
+                listener.onLocationChanged(location);
             }
         });
 
@@ -592,21 +713,90 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                 showToast("موقعیت و درخواست شما به مرکز ارسال شد");
             }
         });
-        // ali code end here
+
+        showToast("Battery Level " + BattryHelper.getBatteryLevel(context) + "");
+
+        final Button btnLocationHistory = (Button) findViewById(R.id.btnLocationHistory);
+        btnLocationHistory.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Calendar c = Calendar.getInstance();
+                Time now = new Time();
+                now.setToNow();
+
+                final ArrayList<String> EnDays = new ArrayList<String>();
+                ArrayList<String> FaDays = new ArrayList<String>();
+
+                for (int i = 0; i < 7; i++) {
+                    Date d = new Date(System.currentTimeMillis() - (86400000) * i);
+                    SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
+                    SimpleDateFormat sdfMonth = new SimpleDateFormat("MM");
+                    SimpleDateFormat sdfDay = new SimpleDateFormat("dd");
+                    PersianCalender persianCalender = new PersianCalender(Integer.parseInt(sdfYear.format(d)), Integer.parseInt(sdfMonth.format(d)), Integer.parseInt(sdfDay.format(d)));
+
+                    FaDays.add(persianCalender.getIranianDate());
+                    EnDays.add(persianCalender.getGregorianYear() + "-" + persianCalender.getGregorianMonth() + "-" + persianCalender.getGregorianDay());
+                }
+
+                String[] arrDays = FaDays.toArray(new String[FaDays.size()]);
+
+                new AlertDialog.Builder(context)
+                        .setSingleChoiceItems(arrDays, 0, null)
+                        .setCancelable(false)
+                        .setTitle("تاریخ را انتخاب نمایید")
+                        .setPositiveButton("نمایش", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.dismiss();
+                                int selectedPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+                                // Do something useful withe the position of the selected radio button
+                                lockOnGps = false;
+                                DuringShowHistory = true;
+                                DatabaseHelper db = new DatabaseHelper(context);
+                                ArrayList<Location> locations = db.getLocationsOfDay(EnDays.get(selectedPosition));
+                                if (locations.size() > 1) {
+                                    MapViewHelper.clearMapView(mapView);
+                                    DrawOnMapHelper.drawPolyLineByLocations(mapView, locations);
+                                } else {
+                                    showToast("موردی برای نمایش موجود نیست");
+                                    DuringShowHistory = false;
+                                }
+                            }
+                        })
+                        .setNegativeButton("خروج", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .show();
+            }
+        });
+
+
+        BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context ctxt, Intent intent) {
+                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+                btnBtrStatus.setText("باتری" + "\n" + String.valueOf(level) + "%");
+                if (level <= 10) btnBtrStatus.setBackgroundColor(Color.RED);
+                if (level > 10 && level <= 40) btnBtrStatus.setBackgroundColor(Color.YELLOW);
+                if (level > 40 && level <= 70) btnBtrStatus.setBackgroundColor(Color.BLUE);
+                if (level > 70) btnBtrStatus.setBackgroundColor(Color.GREEN);
+            }
+        };
+
+        this.registerReceiver(mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
+
+       // ali code end here
 
 
     }
-
-
 
     private void showToast(String s) {
-
-        Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
-
-
-
-
 
     @Override
     protected void onDestroy() {
@@ -743,67 +933,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
             }
         });
     }
-    @Override
-    public void onGpsStatusChanged(int event) {
-
-        switch (event) {
-            case GpsStatus.GPS_EVENT_STARTED:
-                //Toast.makeText(context, "GPS_SEARCHING", Toast.LENGTH_SHORT).show();
-                //   satlateInView.setText("درحال جستجو");
-                break;
-            case GpsStatus.GPS_EVENT_STOPPED:
-                //     satlateInView.setText("توقف جی پی اس");
-                break;
-            case GpsStatus.GPS_EVENT_FIRST_FIX:
-                //     satlateInView.setText("موقعیت شما پیدا شد");
-                /*
-                 * GPS_EVENT_FIRST_FIX Event is called when GPS is locked
-                 */
-                //Toast.makeText(context, "GPS_FIXED", Toast.LENGTH_SHORT).show();
-                Location gpslocation = locationManager
-                        .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-             /*   if(gpslocation != null)
-                {
-                    System.out.println("GPS Info:"+gpslocation.getLatitude()+":"+gpslocation.getLongitude());
-
-                    *//*
-                     * Removing the GPS status listener once GPS is locked
-                     *//*
-                    locationManager.removeGpsStatusListener(this);
-                }*/
-
-                break;
-
-            case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
-                //                 System.out.println("TAG - GPS_EVENT_SATELLITE_STATUS");
-                break;
-        }
-
-      /*  GpsStatus gpsStatus = locationManager.getGpsStatus(null);
-        if(gpsStatus != null) {
-            Iterable<GpsSatellite>satellites = gpsStatus.getSatellites();
-            Iterator<GpsSatellite> sat = satellites.iterator();
-            int CountInView = 0;
-            int CountInUse = 0;
-
-            if (satellites != null) {
-                for (GpsSatellite gpsSatellite : satellites) {
-                    CountInView++;
-                    if (gpsSatellite.usedInFix()) {
-                        CountInUse++;
-                    }
-                }
-                satlateInView.setText("in view: "+CountInView+"\n in use: "+CountInUse);
-        }
-    }*/
-    }
-
-
-
-    public interface MySpinnerListener {
-        void onSelect(String selectedArea, String selectedFile);
-    }
 
     void downloadingFiles() {
         final File areaFolder = new File(mapsFolder, currentArea + "-gh");
@@ -906,7 +1035,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
 
 // ali code to show blue circle on start on last known location
-        showImgOnThisPoint(lastKnowLocation, R.drawable.blue_circle);
+        DrawOnMapHelper.showImgOnThisPoint(context, lastKnowLocation, mapView, R.drawable.blue_circle);
 
 
     }
@@ -938,34 +1067,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
     private void finishPrepare() {
         prepareInProgress = false;
-    }
-
-    private Polyline createPolyline(GHResponse response) {
-        Paint paintStroke = AndroidGraphicFactory.INSTANCE.createPaint();
-        paintStroke.setStyle(Style.STROKE);
-        paintStroke.setColor(Color.BLUE);
-//        paintStroke.setDashPathEffect(new float[]
-//        {
-//            25, 15
-//        });
-        paintStroke.setStrokeWidth(9
-
-
-        );
-
-        // TODO: new mapsforge version wants an mapsforge-paint, not an android paint.
-        // This doesn't seem to support transparceny
-        //paintStroke.setAlpha(128);
-        Polyline line = new Polyline((org.mapsforge.core.graphics.Paint) paintStroke, AndroidGraphicFactory.INSTANCE);
-        List<LatLong> geoPoints = line.getLatLongs();
-        PointList tmp = response.getPoints();
-        for (int i = 0; i < response.getPoints().getSize(); i++) {
-            geoPoints.add(new LatLong(tmp.getLatitude(i), tmp.getLongitude(i)));
-
-
-        }
-
-        return line;
     }
 
     private Marker createMarker(LatLong p, int resource) {
@@ -1003,11 +1104,9 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                         LastRouteLon = lastRouteResponce.getInstructions().get(0).getPoints().getLon(0);
                     }
 
-                    createAndShowInstructionList(lastRouteResponce, llDirectionList);
+                    TextInstructionsHelper.createAndShowInstructionList(context, lastRouteResponce, llDirectionList, mapView, layerCount);
 
-                    createAndPlayVoiceCommand(lastRouteResponce);
-
-
+                    VoiceInstructionsHelper.createAndPlayVoiceCommand(context, lastRouteResponce, voiceFlags);
 
 
                     log("from:" + fromLat + "," + fromLon + " to:" + toLat + ","
@@ -1032,15 +1131,12 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                     }*/
 
 
-
-
-
                     MapViewHelper.clearMapView(mapView);
 
-                    showImgOnThisPoint(lastKnowLocation, R.drawable.blue_circle);
+                    DrawOnMapHelper.showImgOnThisPoint(context, lastKnowLocation, mapView, R.drawable.blue_circle);
 
                     // draw routing
-                    mapView.getLayerManager().getLayers().add(createPolyline(resp));
+                    mapView.getLayerManager().getLayers().add(DrawOnMapHelper.createPolyline(resp));
 
 
                     // create end flag
@@ -1062,93 +1158,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         }.execute();
     }
 
-    private void createAndShowInstructionList(GHResponse lastRouteResponce,LinearLayout llDirectionList) {
-        llDirectionList.removeAllViews();
-        for (int i = 0; i < lastRouteResponce.getInstructions().size(); i++) {
-
-            final Instruction instruction = lastRouteResponce.getInstructions().get(i);
-
-            LayoutInflater inflater = getLayoutInflater();
-            RelativeLayout llDirection_item = (RelativeLayout) inflater.inflate(R.layout.direction_item, null);
-            ImageView img = (ImageView) llDirection_item.findViewById(R.id.imageView);
-            TextView txt = (TextView) llDirection_item.findViewById(R.id.textView);
-
-            String insName = instruction.getName();
-            int insDistance = (int) instruction.getDistance();
-            int insSign = (int) instruction.getSign();
-
-
-            // if (insDistance==0 && insSign !=4) continue;
-
-
-            switch (insSign) {
-                case -3:
-                    txt.setText(" پیچ تند به سمت چپ ");
-                    if (insName.length() > 0)
-                        txt.append("\n" + " به " + insName);
-                    txt.append("\n" + " سپس " + insDistance + " متر " + " ادامه مسیر ");
-                    img.setImageResource(R.drawable.hardleft);
-                    break;
-                case -2:
-                    txt.setText(" پیچ به سمت چپ ");
-                    if (insName.length() > 0)
-                        txt.append("\n" + " به " + insName);
-                    txt.append("\n" + " سپس " + insDistance + " متر " + " ادامه مسیر ");
-                    img.setImageResource(R.drawable.left);
-                    break;
-                case -1:
-                    txt.setText("پیچ ملایم به سمت چپ ");
-                    if (insName.length() > 0)
-                        txt.append("\n" + " به " + insName);
-                    txt.append("\n" + " سپس " + insDistance + " متر " + " ادامه مسیر ");
-                    img.setImageResource(R.drawable.light_left);
-                    break;
-                case 0:
-                    img.setImageResource(R.drawable._continue);
-                    if (insName.length() > 0)
-                        txt.setText(" در  " + insName + "\n" + insDistance + " متر " + " ادامه دهید ");
-                    else
-                        txt.setText(" در همین خیابان " + "\n" + insDistance + " متر " + " ادامه دهید ");
-                    break;
-                case 1:
-                    txt.setText(" پیچ ملایم به سمت راست ");
-                    if (insName.length() > 0)
-                        txt.append("\n" + " به " + insName);
-                    txt.append("\n" + " سپس " + insDistance + " متر " + " ادامه مسیر ");
-                    img.setImageResource(R.drawable.light_right);
-                    break;
-                case 2:
-                    txt.setText(" پیچ  به سمت راست ");
-                    if (insName.length() > 0)
-                        txt.append("\n" + " به " + insName);
-                    txt.append("\n" + " سپس " + insDistance + " متر " + " ادامه مسیر ");
-                    img.setImageResource(R.drawable.right);
-                    break;
-                case 3:
-                    txt.setText(" پیچ تند به سمت راست ");
-                    if (insName.length() > 0)
-                        txt.append("\n" + " به " + insName);
-                    txt.append("\n" + " سپس " + insDistance + " متر " + " ادامه مسیر ");
-                    img.setImageResource(R.drawable.hardright);
-                    break;
-                case 4:
-                    txt.setText(" به مقصد میرسید ");
-                    img.setImageResource(R.drawable.destination);
-                    break;
-            }
-
-            llDirection_item.setTag(instruction);
-            llDirection_item.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    drawPolylineByPoints(instruction.getPoints());
-                }
-            });
-            llDirectionList.addView(llDirection_item);
-
-        }
-    }
-
     private void log(String str) {
         Log.i("GH", str);
     }
@@ -1161,12 +1170,10 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
 
-    private static final int NEW_MENU_ID = Menu.FIRST + 1;
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(0, NEW_MENU_ID, 0, "Google");
+        menu.add(0, NEW_MENU_ID, 0, "پیشگامان آسیا");
         // menu.add(0, NEW_MENU_ID + 1, 0, "Other");
         return true;
     }
@@ -1191,144 +1198,39 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
         return true;
     }
 
-    private void showImgOnThisPoint(LatLong latlong, int IMGresID) {
-        Marker marker = new Marker(latlong,
-                AndroidGraphicFactory.convertToBitmap((getResources().getDrawable(IMGresID))),
-                0,
-                0);
-        mapView.getLayerManager().getLayers().add(marker);
-    }
-
-    private void animateToPoint(double lat, double lon) {
-        mapView.getModel().mapViewPosition.animateTo(new LatLong(lat, lon));
-    }
-
-    private LocationListener listener = new LocationListener() {
-
-
-        @Override
-        public void onLocationChanged(Location location) {
-
-            loc_lastKnowLocation = location;
-            updateGpsStateIcon(GpsState.connected);
-
-            updateSpeedValue(location);
-
-            updateDistanceValue(location);
-
-
-            // send location to store in taximeters
-            putLocationToActiveTaximeters(location);
-
-            if (newLocationEventInProgress) {
-                log.append("new location event ignored\n");
-                return;
-            }
-
-            newLocationEventInProgress = true;
-
-            try {
-
-                log.append("new lat lon\n");
-                // if we lock on gps we navigate to new position
-                if (lockOnGps)
-                    animateToPoint(location.getLatitude(), location.getLongitude());
-
-                // get last location
-                lastGPSLocation = new LatLong(location.getLatitude(), location.getLongitude());
-                lastKnowLocation = new LatLong(location.getLatitude(), location.getLongitude());
-
-
-                if (isInRoutingMode) {
-                    // we are in routing mode
-                    log.append("we are in routing mode\n");
-
-
-                    if (!isReady()) {
-                        log.append("no ready >ret\n");
-                        return;
-                    }
-
-                    if (shortestPathRunning) {
-                        log.append("route in running >ret\n");
-                        return;
-                    }
-
-                    shortestPathRunning = true;
-                    log.append("req new route from lat: " + location.getLatitude() + " lon: " + location.getLongitude() + " to lat: " + end.latitude + " lon: " + end.longitude + "\n");
-                    calcPath(location.getLatitude(), location.getLongitude(), end.latitude, end.longitude);
-
-                } else {
-                    // we are not in routing mode
-                    // show new current point on map
-                    log.append("NOT in routing mode\n");
-                    MapViewHelper.clearMapView(mapView);
-                    showImgOnThisPoint(lastKnowLocation, R.drawable.blue_circle);
-                }
-
-
-            } catch (Exception e) {
-                logUser(e.getMessage());
-                newLocationEventInProgress = false;
-            }
-
-            newLocationEventInProgress = false;
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            btnGpsStatus.setBackgroundColor(Color.GRAY);
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            btnGpsStatus.setBackgroundColor(Color.YELLOW);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            //satlateInView.setText(gpsStatusListener.getSatlateInView()+"");
-
-
-        }
-    };
-
     private void updateDistanceValue(Location location) {
 
         Calendar c = Calendar.getInstance();
         int newDayOfYear = c.get(Calendar.DAY_OF_YEAR);
 
 
-        if (oldDayOfYear==-1 || oldLocation==null || oldDayOfYear!=newDayOfYear){
-            oldLocation=location;
-            oldDayOfYear=newDayOfYear;
+        if (oldDayOfYear == -1 || oldLocation == null || oldDayOfYear != newDayOfYear) {
+            oldLocation = location;
+            oldDayOfYear = newDayOfYear;
+            todayDistance = 0;
             return;
-        }else
-        {
-            double betweenDistance = GpsHelper.distance(oldLocation,location );
-            todayDistance +=betweenDistance;
+        } else {
+            double betweenDistance = GpsHelper.distance(oldLocation, location);
+            todayDistance += betweenDistance;
             Button speed = (Button) findViewById(R.id.btnDistance);
-            speed.setText("مصافت پیموده شده امروز"+"\n"+(int)todayDistance+" m");
+            speed.setText("مصافت پیموده شده امروز" + "\n" + (int) todayDistance + " m");
+            oldDayOfYear = newDayOfYear;
+            oldLocation = location;
         }
-
-        oldDayOfYear=newDayOfYear;
-        oldLocation=location;
 
 
     }
 
     private void updateSpeedValue(Location location) {
         Button speed = (Button) findViewById(R.id.btnSpeed);
-        speed.setText("سرعت"+"\n"+(int)location.getSpeed()+" Km");
+        speed.setText("سرعت" + "\n" + (int) location.getSpeed() + " Km");
     }
 
     private void updateGpsStateIcon(GpsState gpsState) {
-        if (gpsState==GpsState.connected){
+        if (gpsState == GpsState.connected) {
             btnGpsStatus.setBackgroundColor(Color.GREEN);
         }
     }
-
-
 
     public void cancelRouting() {
         Dialog dialog = new AlertDialog.Builder(context)
@@ -1341,7 +1243,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                     public void onClick(DialogInterface dialogInterface, int i) {
                         isInRoutingMode = false;
                         MapViewHelper.clearMapView(mapView);
-                        showImgOnThisPoint(lastKnowLocation, R.drawable.blue_circle);
+                        DrawOnMapHelper.showImgOnThisPoint(context, lastKnowLocation, mapView, R.drawable.blue_circle);
                         llDirectionList.removeAllViews();
                         btnStopRouting.setVisibility(View.GONE);
                     }
@@ -1355,41 +1257,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
                 .create();
 
         dialog.show();
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        float azimuth = Math.round(sensorEvent.values[0]);
-        float pitch = Math.round(sensorEvent.values[1]);
-        float roll = Math.round(sensorEvent.values[2]);
-        // The other values provided are:
-        //  float pitch = event.values[1];
-        //  float roll = event.values[2];
-        // log.setText("Azimuth: " + Float.toString(azimuth) + "\n");
-        //satlateInView.append("pitch: " + Float.toString(pitch) + "\n");
-        //satlateInView.append("roll: " + Float.toString(roll)+"\n");
-
-        AnimationSet animSet = new AnimationSet(true);
-        animSet.setInterpolator(new DecelerateInterpolator());
-        animSet.setFillAfter(false);
-        animSet.setFillEnabled(true);
-
-        final RotateAnimation animRotate = new RotateAnimation(-lastAzimuth, -azimuth,
-                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
-                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
-
-        animRotate.setDuration(200);
-        animRotate.setFillAfter(false);
-        animSet.addAnimation(animRotate);
-
-
-        img4.startAnimation(animSet);
-        lastAzimuth = azimuth;
-
-    }
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
     }
 
     public void putLocationToActiveTaximeters(Location location) {
@@ -1408,135 +1275,54 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
             taximeter4.addToRoute(location);
     }
 
-    VoiceFlags voiceFlags;
-    public void createAndPlayVoiceCommand(GHResponse lastRouteResponce) {
+    @Override
+    protected void onResume() {
 
-        Instruction instruction = lastRouteResponce.getInstructions().get(1);
+        IntentFilter newTaskReceived;
+        newTaskReceived = new IntentFilter(ConnectionService.CONNECTION_SERVICE_INTENT);
+        TaskReceiver receiver = new TaskReceiver();
+        registerReceiver(receiver, newTaskReceived);
 
-        if (voiceFlags==null)
-            voiceFlags = new VoiceFlags(instruction);
-
-        voiceFlags.calculate(instruction);
-
-
-        ArrayList<Integer> voiceList=null;
-
-        if (lastRouteResponce.getDistance() < 10 && !voiceFlags.reachedDestination) {
-            voiceList = new ArrayList<Integer>();
-            voiceList.add(R.raw.reached_destination);
-            voiceFlags.reachedDestination=true;
-        }
-        else if (lastRouteResponce.getInstructions().get(0).getDistance() > 100 && !voiceFlags.over100m) {
-            voiceList = new ArrayList<Integer>();
-            voiceList.add(R.raw.go_ahead);
-            voiceFlags.over100m=true;
-        }
-        else if (lastRouteResponce.getInstructions().get(0).getDistance() <= 100 && lastRouteResponce.getInstructions().get(0).getDistance() > 10 && !voiceFlags.over10m) {
-            voiceList = new ArrayList<Integer>();
-            voiceList.add(R.raw.after);
-            voiceList.add(VoiceInstructions.getVoiceId((int) (lastRouteResponce.getInstructions().get(0).getDistance())));
-            voiceList.add(R.raw.meters);
-            voiceList.add(VoiceInstructions.getVoiceFromSign(lastRouteResponce.getInstructions().get(1).getSign()));
-            voiceFlags.over10m=true;
-        }
-        else if (lastRouteResponce.getInstructions().get(0).getDistance() <= 10 && !voiceFlags.under10m) {
-            voiceList = new ArrayList<Integer>();
-            voiceList.add(VoiceInstructions.getVoiceFromSign(lastRouteResponce.getInstructions().get(1).getSign()));
-            voiceFlags.under10m=true;
-        }
+        IntentFilter a;
+        a = new IntentFilter(ConnectionService.CONNECTION_STATUS);
+        ConnectionStatusReceiver b = new ConnectionStatusReceiver();
+        registerReceiver(b, a);
 
 
-        playVoiceList(voiceList);
-
-
-    }
-
-    public void playVoiceList(final ArrayList<Integer> voiceList){
-
-        if (voiceList==null) return;
-
-        if (voiceList.size() > 0) {
-            int voiceId = voiceList.get(0);
-            voiceList.remove(0);
-
-            MediaPlayer mediaPlayer = MediaPlayer.create(context, voiceId);
-            mediaPlayer.getDuration();
-
-
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mp.release();
-                    playVoiceList(voiceList);
-                }
-            });
-            mediaPlayer.start();
-
-        }
-
-    }
-
-    public void drawPolylineByPoints(PointList pointList) {
-
-
-        if (layerCount == -1)
-            layerCount = mapView.getLayerManager().getLayers().size();
-        else {
-            while (mapView.getLayerManager().getLayers().size() != layerCount) {
-                mapView.getLayerManager().getLayers().remove(mapView.getLayerManager().getLayers().size() - 1);
-            }
-        }
-
-        Paint paintStroke = AndroidGraphicFactory.INSTANCE.createPaint();
-        paintStroke.setStyle(Style.STROKE);
-        paintStroke.setColor(Color.RED);
-//        paintStroke.setDashPathEffect(new float[]
-//                {
-//                        25, 15
-//                });
-        paintStroke.setStrokeWidth(20);
-
-        Polyline line = new Polyline((org.mapsforge.core.graphics.Paint) paintStroke, AndroidGraphicFactory.INSTANCE);
-        List<LatLong> geoPoints = line.getLatLongs();
-        PointList tmp = pointList;
-        for (int i = 0; i < pointList.getSize(); i++) {
-            geoPoints.add(new LatLong(tmp.getLatitude(i), tmp.getLongitude(i)));
-
-        }
-
-
-        mapView.getLayerManager().getLayers().add(line);
-        animateToPoint(pointList.getLat(0), pointList.getLon(0));
-
+        super.onResume();
     }
 
 
+    public static enum GpsState {connected, disconnected}
 
 
+    public interface MySpinnerListener {
+        void onSelect(String selectedArea, String selectedFile);
+    }
+
+    // - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
+    // - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-
-    // - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - -
-    public class TaskReceiver extends BroadcastReceiver
-    {
+    public class TaskReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
         {
             final Task task = ((Task) intent.getSerializableExtra("TASK"));
             new AlertDialog.Builder(context)
                     .setTitle("ماموریت جدید دریافت شد")
-                    .setMessage("fromlat:"+task.getFromLat()+"\n"+"fromlon:"+task.getFromLon()+"\n"+"tolat:"+task.getToLat()+"\n"+"tolon:"+task.getToLat()+"\n"+"description:"+task.getDescription()+"\n"+"\n"+"date:"+task.getDate())
+                    .setMessage("fromlat:" + task.getFromLat() + "\n" + "fromlon:" + task.getFromLon() + "\n" + "tolat:" + task.getToLat() + "\n" + "tolon:" + task.getToLat() + "\n" + "description:" + task.getDescription() + "\n" + "\n" + "date:" + task.getDate())
                     .setPositiveButton("قبول و مسیریابی", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // continue with delete
                             shortestPathRunning = true;
                             isInRoutingMode = true;
 
-                            if (voiceFlags!=null)
+                            if (voiceFlags != null)
                                 voiceFlags.clear();
 
-                            calcPath(lastKnowLocation.latitude, lastKnowLocation.longitude,task.getToLat(),task.getToLon());
+                            calcPath(lastKnowLocation.latitude, lastKnowLocation.longitude, task.getToLat(), task.getToLon());
                         }
                     })
                     .setNegativeButton("رد", new DialogInterface.OnClickListener() {
@@ -1550,13 +1336,13 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
         }
     }
+
     // - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - -
-    public class ConnectionStatusReceiver extends BroadcastReceiver
-    {
+    public class ConnectionStatusReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
         {
-            switch (intent.getIntExtra("status", 0)){
+            switch (intent.getIntExtra("status", 0)) {
                 case 1:
 
                     btnSrvStatus.setBackgroundColor(Color.GREEN);
@@ -1571,44 +1357,47 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Sensor
 
         }
     }
+
     // - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - -
+    public class MessageReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
+        {
+            try {
+                JSONObject obj = new JSONObject(intent.getStringExtra("MESSAGE"));
 
+                final Message message = Message.getObjectFromJSON(obj);
+                if (message.getX1().equals("task")){
+                    
+                    new AlertDialog.Builder(context)
+                            .setTitle("ماموریت جدید دریافت شد")
+                            .setMessage("fromlat:" + message.getX2() + "\n" + "fromlon:" + message.getX3() + "\n" + "tolat:" + message.getX4() + "\n" + "tolon:" + message.getX5() + "\n" + "description:" + message.getX6() + "\n" + "\n" + "date:" + message.getX7())
+                            .setPositiveButton("قبول و مسیریابی", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // continue with delete
+                                    shortestPathRunning = true;
+                                    isInRoutingMode = true;
 
-    @Override
-    protected void onResume() {
+                                    if (voiceFlags != null)
+                                        voiceFlags.clear();
 
-        IntentFilter newTaskReceived;
-        newTaskReceived = new IntentFilter(ConnectionService.CONNECTION_SERVICE_INTENT);
-        TaskReceiver receiver = new TaskReceiver();
-        registerReceiver(receiver, newTaskReceived);
+                                    calcPath(lastKnowLocation.latitude, lastKnowLocation.longitude, Double.parseDouble(message.getX1()),Double.parseDouble( message.getX1()));
+                                }
+                            })
+                            .setNegativeButton("رد", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // do nothing
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
 
+                }
+            } catch (Exception e) {
 
-
-        IntentFilter a;
-        a = new IntentFilter(ConnectionService.CONNECTION_STATUS);
-        ConnectionStatusReceiver b = new ConnectionStatusReceiver();
-        registerReceiver(b, a);
-
-
-        super.onResume();
+            }
+        }
     }
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

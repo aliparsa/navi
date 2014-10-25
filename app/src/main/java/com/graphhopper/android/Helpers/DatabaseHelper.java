@@ -6,9 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
+import android.os.Bundle;
 import android.util.Log;
 
 
+import com.graphhopper.android.DataModel.Message;
 import com.graphhopper.android.DataModel.MyLocation;
 
 import org.mapsforge.core.model.LatLong;
@@ -31,37 +33,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Contacts table name
     private static final String TABLE_LOCATIONS = "locations";
-    private static final String TABLE_NODES = "nodes";
-    private static final String TABLE_WAYS = "ways";
-    private static final String TABLE_WAY_NODES = "way_nodes";
-
+    private static final String TABLE_PRIVATE_LOCATIONS = "private_locations";
+    private static final String TABLE_MESSAGE = "message";
 
     // Contacts Table Columns names LOCATIONS
-    private static final String LOCATIONS_KEY_ID = "id";
-    private static final String LOCATIONS_KEY_LAT = "lat";
-    private static final String LOCATIONS_KEY_LON = "lon";
-    private static final String LOCATIONS_KEY_DATE = "date";
-    private static final String LOCATIONS_KEY_DEVICE_ID = "device_id";
+    private static final String KEY_ID = "id";
+    private static final String KEY_LAT = "lat";
+    private static final String KEY_LON = "lon";
+    private static final String KEY_DATE = "date";
     private static final String LOCATIONS_KEY_SPEED = "speed";
     private static final String LOCATIONS_KEY_SENDED = "sended";
 
-    // Contacts Table Columns names NODES
-    private static final String NODES_KEY_ID = "id";
-    private static final String NODES_KEY_LAT = "lat";
-    private static final String NODES_KEY_LON = "lon";
+    // Contacts Table Columns names PRIVATE LOCATIONS
+    private static final String PRIVATE_LOCATIONS_KEY_NAME = "name";
 
-    // Contacts Table Columns names WAYS
-    private static final String WAYS_KEY_ID = "id";
+    private static final String KEY_X1 = "x1";
+    private static final String KEY_X2 = "x2";
+    private static final String KEY_X3 = "x3";
+    private static final String KEY_X4 = "x4";
+    private static final String KEY_X5 = "x5";
+    private static final String KEY_X6 = "x6";
+    private static final String KEY_X7 = "x7";
+    private static final String KEY_X8 = "x8";
+    private static final String KEY_X9 = "x9";
+    private static final String KEY_X10 = "x10";
 
-
-    // Contacts Table Columns names WAY_NODES
-    private static final String WAY_NODES_KEY_WAY_ID = "way_id";
-    private static final String WAY_NODES_KEY_NODE_ID = "node_id";
-
-
-
-    private int record_id;
-    private int device_id;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -73,14 +69,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String CREATE_CONTACTS_TABLE =
                 "CREATE TABLE " + TABLE_LOCATIONS + "("
-                        + LOCATIONS_KEY_ID + " INTEGER PRIMARY KEY,"
-                        + LOCATIONS_KEY_LAT + " TEXT,"
-                        + LOCATIONS_KEY_LON + " TEXT,"
-                        + LOCATIONS_KEY_DATE + " TEXT,"
+                        + KEY_ID + " INTEGER PRIMARY KEY,"
+                        + KEY_LAT + " TEXT,"
+                        + KEY_LON + " TEXT,"
+                        + KEY_DATE + " TEXT,"
                         + LOCATIONS_KEY_SPEED + " TEXT,"
                         + LOCATIONS_KEY_SENDED + " TEXT"
                         + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
+
+        String CREATE_PRIVATE_LOCATIONS_TABLE =
+                "CREATE TABLE " + TABLE_PRIVATE_LOCATIONS + "("
+                        + KEY_ID + " INTEGER PRIMARY KEY,"
+                        + KEY_LAT + " TEXT,"
+                        + KEY_LON + " TEXT,"
+                        + KEY_DATE + " TEXT,"
+                        + PRIVATE_LOCATIONS_KEY_NAME + " TEXT"
+                        + ")";
+        db.execSQL(CREATE_PRIVATE_LOCATIONS_TABLE);
+
+        String CREATE_MESSAGE_TABLE =
+                "CREATE TABLE " + TABLE_MESSAGE + "("
+                        + KEY_ID + " INTEGER PRIMARY KEY,"
+                        + KEY_X1 + " TEXT,"
+                        + KEY_X2 + " TEXT,"
+                        + KEY_X3 + " TEXT,"
+                        + KEY_X4 + " TEXT,"
+                        + KEY_X5 + " TEXT,"
+                        + KEY_X6 + " TEXT,"
+                        + KEY_X7 + " TEXT,"
+                        + KEY_X8 + " TEXT,"
+                        + KEY_X9 + " TEXT,"
+                        + KEY_X10 + " TEXT"
+                        + ")";
+        db.execSQL(CREATE_MESSAGE_TABLE);
+
         database = db;
     }
 
@@ -89,14 +112,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    public void insertMessage(Message message){
+        ContentValues values = new ContentValues();
+        values.put(KEY_X1,message.getX1() );
+        values.put(KEY_X2,message.getX2() );
+        values.put(KEY_X3,message.getX3() );
+        values.put(KEY_X4,message.getX4() );
+        values.put(KEY_X5,message.getX5() );
+        values.put(KEY_X6,message.getX6() );
+        values.put(KEY_X7,message.getX7() );
+        values.put(KEY_X8,message.getX8() );
+        values.put(KEY_X9,message.getX9() );
+        values.put(KEY_X10,message.getX10() );
+        this.getWritableDatabase().insert(TABLE_MESSAGE,null,values);
+    }
+
     public void insertLocation(Location location,String date) {
         ContentValues values = new ContentValues();
-        values.put(LOCATIONS_KEY_LAT, location.getLatitude()+"");
-        values.put(LOCATIONS_KEY_LON, location.getLongitude()+"");
-        values.put(LOCATIONS_KEY_DATE, date+"");
+        values.put(KEY_LAT, location.getLatitude()+"");
+        values.put(KEY_LON, location.getLongitude()+"");
+        values.put(KEY_DATE, date+"");
         values.put(LOCATIONS_KEY_SPEED, location.getSpeed()+"");
         values.put(LOCATIONS_KEY_SENDED, "0");
         this.getWritableDatabase().insert(TABLE_LOCATIONS,null,values);
+    }
+
+    public void insertPrivateLocation(LatLong location,String date,String name) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_LAT, location.latitude+"");
+        values.put(KEY_LON, location.longitude+"");
+        values.put(KEY_DATE, date+"");
+        values.put(PRIVATE_LOCATIONS_KEY_NAME, name+"");
+        this.getWritableDatabase().insert(TABLE_PRIVATE_LOCATIONS,null,values);
     }
 
     public void bulkMarkRecordsAsSent(int maxID){
@@ -115,11 +162,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 do{
                     location = new MyLocation("ali");
-                    location.setLatitude(Double.parseDouble(cursor.getString(cursor.getColumnIndex(LOCATIONS_KEY_LAT))));
-                    location.setLongitude(Double.parseDouble(cursor.getString(cursor.getColumnIndex(LOCATIONS_KEY_LON))));
+                    location.setLatitude(Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_LAT))));
+                    location.setLongitude(Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_LON))));
                     location.setSpeed(Float.parseFloat(cursor.getString(cursor.getColumnIndex(LOCATIONS_KEY_SPEED))));
-                    location.setRecord_id(Integer.parseInt(cursor.getString(cursor.getColumnIndex(LOCATIONS_KEY_ID))));
-                    location.setDate(cursor.getString(cursor.getColumnIndex(LOCATIONS_KEY_DATE)));
+                    location.setRecord_id(Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_ID))));
+                    location.setDate(cursor.getString(cursor.getColumnIndex(KEY_DATE)));
 
                     loc_list.add(location);
                 }while(cursor.moveToNext());
@@ -138,8 +185,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if(cursor.moveToFirst()) {
 
                 do{
-                    latlong = new LatLong(Double.parseDouble(cursor.getString(cursor.getColumnIndex(LOCATIONS_KEY_LAT))),Double.parseDouble(cursor.getString(cursor.getColumnIndex(LOCATIONS_KEY_LON))));
+                    latlong = new LatLong(Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_LAT))),Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_LON))));
                     latlon_list.add(latlong);
+
+                }while(cursor.moveToNext());
+
+            }
+        }
+        return latlon_list;
+    }
+
+    public ArrayList<Location> getAllLocation() {
+        final Cursor cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_LOCATIONS , null);
+        ArrayList<Location> latlon_list = new ArrayList<Location>();
+
+        if (cursor != null) {
+            if(cursor.moveToFirst()) {
+
+                do{
+                    Location location = new Location("ali");
+                    location.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LAT)));
+                    location.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LON)));
+                    location.setSpeed(cursor.getFloat(cursor.getColumnIndex(LOCATIONS_KEY_SPEED)));
+                    Bundle bundle = new Bundle();
+                    bundle.putString("date",cursor.getString(cursor.getColumnIndex(KEY_DATE)));
+                    location.setExtras(bundle);
+                    latlon_list.add(location);
 
                 }while(cursor.moveToNext());
 
@@ -155,7 +226,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor != null) {
             if(cursor.moveToLast()) {
-                    latlong = new LatLong(Double.parseDouble(cursor.getString(cursor.getColumnIndex(LOCATIONS_KEY_LAT))),Double.parseDouble(cursor.getString(cursor.getColumnIndex(LOCATIONS_KEY_LON))));
+                    latlong = new LatLong(Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_LAT))),Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_LON))));
             }
         }
 
@@ -167,7 +238,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    public  ArrayList<Location> getLocationsOfDay(String s) {
+        final Cursor cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_LOCATIONS +" WHERE "+KEY_DATE+" LIKE '"+s+"%'" , null);
+        ArrayList<Location> latlon_list = new ArrayList<Location>();
 
+        if (cursor != null) {
+            if(cursor.moveToFirst()) {
 
+                do{
+                    Location location = new Location("ali");
+                    location.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LAT)));
+                    location.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LON)));
+                    location.setSpeed(cursor.getFloat(cursor.getColumnIndex(LOCATIONS_KEY_SPEED)));
+                    Bundle bundle = new Bundle();
+                    bundle.putString("date",cursor.getString(cursor.getColumnIndex(KEY_DATE)));
+                    location.setExtras(bundle);
+                    latlon_list.add(location);
 
+                }while(cursor.moveToNext());
+
+            }
+        }
+        return latlon_list;
+    }
+
+    public ArrayList<Message> getAllMessages() {
+
+        final Cursor cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_MESSAGE , null);
+        ArrayList<Message> messageArrayList = new ArrayList<Message>();
+
+        if (cursor != null) {
+            if(cursor.moveToFirst()) {
+
+                do{
+                    Message message = new Message(
+                            cursor.getString(cursor.getColumnIndex(KEY_X1)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X2)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X3)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X4)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X5)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X6)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X7)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X8)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X9)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X10))
+                            );
+
+                    messageArrayList.add(message);
+
+                }while(cursor.moveToNext());
+
+            }
+        }
+        return messageArrayList;
+    }
 }

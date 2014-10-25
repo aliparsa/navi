@@ -1,4 +1,4 @@
-package com.graphhopper.android.utilities;
+package com.graphhopper.android.Helpers;
 
 import java.util.Timer;
 import java.util.TimerTask;

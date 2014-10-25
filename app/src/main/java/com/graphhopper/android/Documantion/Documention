@@ -1,0 +1,12 @@
+
+Message object fields for task object sent by server
+
+name     mean
+--------------
+x1       type
+x2       lat
+x3       lon
+x4       to lat
+x5       to lon
+x6       description
+x7       date

@@ -1,4 +1,4 @@
-package com.graphhopper.android;
+package com.graphhopper.android.Helpers;
 
 import java.io.BufferedReader;
 import java.io.IOException;

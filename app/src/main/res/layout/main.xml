@@ -10,30 +10,22 @@
         android:layout_width="500dp"
 
         android:layout_height="fill_parent"
-        android:layout_above="@+id/horizontalScrollView"
 
+        android:layout_toRightOf="@+id/scrollView4"
         android:layout_toLeftOf="@+id/scrollView2"
-        android:layout_toRightOf="@+id/scrollView4">
+        android:layout_alignBottom="@+id/scrollView2">
 
 
         <RelativeLayout
             android:id="@+id/llControls"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:orientation="horizontal"
-            android:padding="3dp">
+            android:padding="3dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
 
 
-            <ImageView
-                android:id="@+id/imageView6"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:src="@drawable/compas" />
 
             <TextView
                 android:id="@+id/log"
@@ -56,7 +48,6 @@
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:background="#aa979797"
-                android:layout_alignTop="@+id/imageView6"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true">
 
@@ -82,7 +73,7 @@
 
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:background="#fffffdab">
+        android:background="#7cfff6a8">
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -216,7 +207,7 @@
         android:layout_width="80dp"
         android:layout_height="fill_parent"
         android:layout_above="@+id/horizontalScrollView"
-        android:background="#ffffff8f" >
+        android:background="#7cfff6a8" >
 
         <LinearLayout
             android:orientation="vertical"
@@ -232,7 +223,13 @@
                 android:id="@+id/btnLocationManagement"
                 android:layout_width="fill_parent"
                 android:layout_height="85dp"
-                android:text="Location Manager" />
+                android:text="نقطه مکان ها" />
+
+            <Button
+                android:id="@+id/btnLocationHistory"
+                android:layout_width="fill_parent"
+                android:layout_height="85dp"
+                android:text="تاریخچه حرکت" />
 
             </LinearLayout>
     </ScrollView>
@@ -240,10 +237,10 @@
     <RelativeLayout
         android:id="@+id/horizontalScrollView"
         android:layout_width="fill_parent"
-        android:layout_height="80dp"
+        android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="#fffff6a8" >
+        android:background="#7cfff6a8" >
 
 
 
@@ -297,43 +294,49 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/relativeLayout">
 
             <Button
                 android:id="@+id/btnPinOnGps"
-                android:layout_width="@dimen/bottom_bar_button_width"
+                android:layout_weight=".2"
+                android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:text="PinGPS" />
+                android:text="برو به GPS" />
             <Button
                 android:id="@+id/btnSetting"
+                android:layout_weight=".2"
                 android:layout_width="@dimen/bottom_bar_button_width"
                 android:layout_height="fill_parent"
-                android:text="Setting" />
+                android:text="تنظیمات" />
 
 
             <Button
                 android:id="@+id/btnMessaging"
                 android:layout_width="@dimen/bottom_bar_button_width"
+                android:layout_weight=".2"
                 android:layout_height="fill_parent"
-                android:text="Msg" />
+                android:text="پیام ها" />
 
 
 
             <Button
                 android:id="@+id/btnFuelManagement"
                 android:layout_width="@dimen/bottom_bar_button_width"
+                android:layout_weight=".2"
                 android:layout_height="fill_parent"
-                android:text="Fuel" />
+                android:text="مدیریت سوخت" />
 
             <Button
                 android:id="@+id/btnSos"
                 android:layout_width="@dimen/bottom_bar_button_width"
+                android:layout_weight=".2"
                 android:layout_height="fill_parent"
-                android:text="SOS"
+                android:text="درخواست کمک"
                 android:textColor="#ffff0021" />
 
         </LinearLayout>
