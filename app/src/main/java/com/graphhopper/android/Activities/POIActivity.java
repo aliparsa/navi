@@ -7,7 +7,7 @@ import android.view.MenuItem;
 
 import com.graphhopper.android.R;
 
-public class SearchPOIActivity extends Activity {
+public class POIActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

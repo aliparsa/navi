@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.graphhopper.android.DataModel.FavoritePoint;
 import com.graphhopper.android.DataModel.Message;
 import com.graphhopper.android.R;
 
@@ -46,9 +47,12 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
     // main linear layout in view
 
     LinearLayout ll_message;
+    LinearLayout ll_favorite_point;
 
 
     public ListViewCustomAdapter(Context context, int layoutResourceID,
+
+
                                  ArrayList<T> itemList) {
         super(context, layoutResourceID, itemList);
 
@@ -81,17 +85,31 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
 //            animation.setStartOffset(20 * (position + 1));
 
             ll_message = (LinearLayout) view.findViewById(R.id.ll_message);
+            ll_favorite_point = (LinearLayout) view.findViewById(R.id.ll_FavoritePoint);
         }
 
 
         T item = itemList.get(position);
 
+
         Message messageItem;
         if (item instanceof Message) {
-             messageItem = (Message) item;
+            messageItem = (Message) item;
+            holder.setTag(messageItem);
             getMessageItem(holder, messageItem);
             OnlyShow(ll_message);
         }
+
+
+
+        FavoritePoint favoritePoint;
+        if (item instanceof FavoritePoint) {
+            favoritePoint = (FavoritePoint) item;
+            holder.setTag(favoritePoint);
+            getFavoritePointItem(holder, favoritePoint);
+            OnlyShow(ll_favorite_point);
+        }
+
 
         view.setTag(holder);
 
@@ -100,6 +118,9 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
     }
 
     public void OnlyShow(LinearLayout lv) {
+        ll_message.setVisibility(View.GONE);
+        ll_favorite_point.setVisibility(View.GONE);
+
         lv.setVisibility(LinearLayout.VISIBLE);
     }
 
@@ -115,9 +136,20 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
 
         holder.messageTitle.setText(item.getX2());
         holder.messageSubtitle.setText(item.getX3());
+    }
 
 
+    private void getFavoritePointItem(DrawerItemHolder holder, FavoritePoint item) {
 
+        if (holder.favoritePointTitle == null)
+            holder.favoritePointTitle = (TextView) ll_favorite_point.findViewById(R.id.favoritePoint_title);
+
+        if (holder.favoritePointSubtitle == null)
+            holder.favoritePointSubtitle = (TextView) ll_favorite_point.findViewById(R.id.favoritePoint_subtitle);
+
+
+        holder.favoritePointTitle.setText(item.getDescription());
+        holder.favoritePointSubtitle.setText(item.getDescription());
     }
 
 
@@ -131,8 +163,11 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
         // Message Item ------------
         TextView messageTitle;
         TextView messageSubtitle;
-        TextView messageDate;
-        ///------------------------
+
+        // FavoritePoint Item ------------
+        TextView favoritePointTitle;
+        TextView favoritePointSubtitle;
+
 
         public Object getTag() {
             return tag;

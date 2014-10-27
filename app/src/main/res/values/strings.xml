@@ -10,5 +10,6 @@
     <string name="title_activity_search_poi">SearchPOIActivity</string>
     <string name="title_activity_feul">FeulActivity</string>
     <string name="title_activity_movement_history">MovementHistoryActivity</string>
+    <string name="title_activity_private_poi">PrivatePoiActivity</string>
 
 </resources>

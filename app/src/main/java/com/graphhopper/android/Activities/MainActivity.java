@@ -45,6 +45,7 @@ import android.widget.Toast;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
+import com.graphhopper.android.DataModel.FavoritePoint;
 import com.graphhopper.android.DataModel.Message;
 import com.graphhopper.android.DataModel.Task;
 import com.graphhopper.android.DataModel.Taximeter;
@@ -133,6 +134,7 @@ public class MainActivity extends Activity {
     Button btnSetting;
     Button btnMessaging;
     Button btnPinOnGps;
+    Button btnFavoritePoint;
     VoiceFlags voiceFlags;
     private MapView mapView;
     private GraphHopper hopper;
@@ -349,7 +351,7 @@ public class MainActivity extends Activity {
                                 public void onClick(DialogInterface dialog, int which) {
                                     DatabaseHelper db = new DatabaseHelper(context);
                                     try {
-                                        db.insertPrivateLocation(tapLatLong, "2014-10-10", input.getText().toString());
+                                        db.insertFavoritePoint(new FavoritePoint(tapLatLong.latitude,tapLatLong.longitude,input.getText().toString(),"2014-10-10","","","","",""));
                                         showToast("با موفقیت ذخیره شد");
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -437,6 +439,16 @@ public class MainActivity extends Activity {
 
 
         // ali code start from here
+
+        btnFavoritePoint = (Button) findViewById(R.id.btnFavoritePoint);
+        btnFavoritePoint.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context,FavoritePointActivity.class);
+                startActivity(intent);
+
+            }
+        });
 
 
         //setting = new Setting(this);

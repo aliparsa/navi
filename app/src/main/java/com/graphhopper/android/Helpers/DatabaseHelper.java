@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 
+import com.graphhopper.android.DataModel.FavoritePoint;
 import com.graphhopper.android.DataModel.Message;
 import com.graphhopper.android.DataModel.MyLocation;
 
@@ -33,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Contacts table name
     private static final String TABLE_LOCATIONS = "locations";
-    private static final String TABLE_PRIVATE_LOCATIONS = "private_locations";
+    private static final String TABLE_FAVORITE_POINT = "favorite_point";
     private static final String TABLE_MESSAGE = "message";
 
     // Contacts Table Columns names LOCATIONS
@@ -41,6 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_LAT = "lat";
     private static final String KEY_LON = "lon";
     private static final String KEY_DATE = "date";
+    private static final String KEY_DESCRIPTION = "description";
     private static final String LOCATIONS_KEY_SPEED = "speed";
     private static final String LOCATIONS_KEY_SENDED = "sended";
 
@@ -67,6 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
+
         String CREATE_CONTACTS_TABLE =
                 "CREATE TABLE " + TABLE_LOCATIONS + "("
                         + KEY_ID + " INTEGER PRIMARY KEY,"
@@ -78,15 +81,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
 
-        String CREATE_PRIVATE_LOCATIONS_TABLE =
-                "CREATE TABLE " + TABLE_PRIVATE_LOCATIONS + "("
+
+        String CREATE_FAVORITE_POINT_TABLE =
+                "CREATE TABLE " + TABLE_FAVORITE_POINT + "("
                         + KEY_ID + " INTEGER PRIMARY KEY,"
                         + KEY_LAT + " TEXT,"
                         + KEY_LON + " TEXT,"
                         + KEY_DATE + " TEXT,"
-                        + PRIVATE_LOCATIONS_KEY_NAME + " TEXT"
+                        + KEY_DESCRIPTION + " TEXT,"
+                        + KEY_X1 + " TEXT,"
+                        + KEY_X2 + " TEXT,"
+                        + KEY_X3 + " TEXT,"
+                        + KEY_X4 + " TEXT,"
+                        + KEY_X5 + " TEXT"
                         + ")";
-        db.execSQL(CREATE_PRIVATE_LOCATIONS_TABLE);
+        db.execSQL(CREATE_FAVORITE_POINT_TABLE);
+
 
         String CREATE_MESSAGE_TABLE =
                 "CREATE TABLE " + TABLE_MESSAGE + "("
@@ -134,16 +144,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_DATE, date+"");
         values.put(LOCATIONS_KEY_SPEED, location.getSpeed()+"");
         values.put(LOCATIONS_KEY_SENDED, "0");
-        this.getWritableDatabase().insert(TABLE_LOCATIONS,null,values);
+        long a;
+        a=this.getWritableDatabase().insert(TABLE_LOCATIONS,null,values);
+        int aa=10;
     }
 
-    public void insertPrivateLocation(LatLong location,String date,String name) {
+    public void insertFavoritePoint(FavoritePoint favoritePoint) {
         ContentValues values = new ContentValues();
-        values.put(KEY_LAT, location.latitude+"");
-        values.put(KEY_LON, location.longitude+"");
-        values.put(KEY_DATE, date+"");
-        values.put(PRIVATE_LOCATIONS_KEY_NAME, name+"");
-        this.getWritableDatabase().insert(TABLE_PRIVATE_LOCATIONS,null,values);
+        values.put(KEY_LAT, favoritePoint.getLat()+"");
+        values.put(KEY_LON, favoritePoint.getLon()+"");
+        values.put(KEY_DATE, favoritePoint.getDate());
+        values.put(KEY_DESCRIPTION, favoritePoint.getDescription());
+        values.put(KEY_X1, favoritePoint.getX1());
+        values.put(KEY_X2, favoritePoint.getX2());
+        values.put(KEY_X3, favoritePoint.getX3());
+        values.put(KEY_X4, favoritePoint.getX4());
+        values.put(KEY_X5, favoritePoint.getX5());
+        long a;
+        a=this.getWritableDatabase().insert(TABLE_FAVORITE_POINT,null,values);
+        int aa=10;
     }
 
     public void bulkMarkRecordsAsSent(int maxID){
@@ -262,9 +281,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return latlon_list;
     }
 
-    public ArrayList<Message> getAllMessages() {
+    public ArrayList<Message> getAllMessages(String key) {
 
-        final Cursor cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_MESSAGE , null);
+        final Cursor cursor;
+        if (key==null || key=="")
+            cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_MESSAGE , null);
+        else
+            cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_MESSAGE+" WHERE "+KEY_X1+" LIKE '"+key+"%'" , null);
+
         ArrayList<Message> messageArrayList = new ArrayList<Message>();
 
         if (cursor != null) {
@@ -291,5 +315,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return messageArrayList;
+    }
+
+
+
+    public ArrayList<FavoritePoint> getAllFavoritePoint(String key) {
+
+
+        final Cursor cursor;
+        if (key==null || key=="")
+            cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_FAVORITE_POINT , null);
+        else
+            cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_FAVORITE_POINT+" WHERE "+KEY_DESCRIPTION+" LIKE '"+key+"%'" , null);
+
+        ArrayList<FavoritePoint> favoritePoints = new ArrayList<FavoritePoint>();
+
+        if (cursor != null) {
+            if(cursor.moveToFirst()) {
+
+                do{
+                    FavoritePoint favoritePoint = new FavoritePoint(
+                            cursor.getDouble(cursor.getColumnIndex(KEY_LAT)),
+                            cursor.getDouble(cursor.getColumnIndex(KEY_LON)),
+                            cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION)),
+                            cursor.getString(cursor.getColumnIndex(KEY_DATE)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X1)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X2)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X3)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X4)),
+                            cursor.getString(cursor.getColumnIndex(KEY_X5))
+
+                    );
+
+                    favoritePoints.add(favoritePoint);
+
+                }while(cursor.moveToNext());
+
+            }
+        }
+        return favoritePoints;
+
     }
 }
