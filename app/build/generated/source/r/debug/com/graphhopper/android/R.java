@@ -35,16 +35,15 @@ public final class R {
         public static final int left=0x7f02000c;
         public static final int light_left=0x7f02000d;
         public static final int light_right=0x7f02000e;
-        public static final int location_green=0x7f02000f;
-        public static final int logo=0x7f020010;
-        public static final int point=0x7f020011;
-        public static final int right=0x7f020012;
-        public static final int routing=0x7f020013;
-        public static final int satlate=0x7f020014;
-        public static final int setting_icon=0x7f020015;
-        public static final int settings=0x7f020016;
-        public static final int taximeter=0x7f020017;
-        public static final int taximeter_background=0x7f020018;
+        public static final int logo=0x7f02000f;
+        public static final int point=0x7f020010;
+        public static final int right=0x7f020011;
+        public static final int routing=0x7f020012;
+        public static final int satlate=0x7f020013;
+        public static final int setting_icon=0x7f020014;
+        public static final int settings=0x7f020015;
+        public static final int taximeter=0x7f020016;
+        public static final int taximeter_background=0x7f020017;
     }
     public static final class id {
         public static final int action_settings=0x7f09003a;
