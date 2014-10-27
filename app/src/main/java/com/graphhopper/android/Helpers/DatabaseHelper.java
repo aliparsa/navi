@@ -11,8 +11,10 @@ import android.util.Log;
 
 
 import com.graphhopper.android.DataModel.FavoritePoint;
+import com.graphhopper.android.DataModel.Fuel;
 import com.graphhopper.android.DataModel.Message;
 import com.graphhopper.android.DataModel.MyLocation;
+import com.graphhopper.android.DataModel.Setting;
 
 import org.mapsforge.core.model.LatLong;
 
@@ -36,6 +38,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_LOCATIONS = "locations";
     private static final String TABLE_FAVORITE_POINT = "favorite_point";
     private static final String TABLE_MESSAGE = "message";
+    private static final String TABLE_FEUL = "fuel";
 
     // Contacts Table Columns names LOCATIONS
     private static final String KEY_ID = "id";
@@ -43,12 +46,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_LON = "lon";
     private static final String KEY_DATE = "date";
     private static final String KEY_DESCRIPTION = "description";
-    private static final String LOCATIONS_KEY_SPEED = "speed";
-    private static final String LOCATIONS_KEY_SENDED = "sended";
-
-    // Contacts Table Columns names PRIVATE LOCATIONS
-    private static final String PRIVATE_LOCATIONS_KEY_NAME = "name";
-
+    private static final String KEY_SPEED = "speed";
+    private static final String KEY_SENT = "sended";
+    private static final String KEY_LITER = "liter";
     private static final String KEY_X1 = "x1";
     private static final String KEY_X2 = "x2";
     private static final String KEY_X3 = "x3";
@@ -76,8 +76,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         + KEY_LAT + " TEXT,"
                         + KEY_LON + " TEXT,"
                         + KEY_DATE + " TEXT,"
-                        + LOCATIONS_KEY_SPEED + " TEXT,"
-                        + LOCATIONS_KEY_SENDED + " TEXT"
+                        + KEY_SPEED + " TEXT,"
+                        + KEY_SENT + " TEXT"
                         + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
 
@@ -114,6 +114,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         + ")";
         db.execSQL(CREATE_MESSAGE_TABLE);
 
+
+        String CREATE_FUEL_TABLE =
+                "CREATE TABLE " + TABLE_FEUL + "("
+                        + KEY_ID + " INTEGER PRIMARY KEY,"
+                        + KEY_DATE + " TEXT,"
+                        + KEY_LITER + " TEXT"
+                        + ")";
+        db.execSQL(CREATE_FUEL_TABLE);
+
         database = db;
     }
 
@@ -121,6 +130,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
 
     }
+
+
+    public void insertFuel(String liter,String date){
+        ContentValues values = new ContentValues();
+        values.put(KEY_LITER,liter );
+        values.put(KEY_DATE,date);
+        this.getWritableDatabase().insert(TABLE_FEUL,null,values);
+    }
+
 
     public void insertMessage(Message message){
         ContentValues values = new ContentValues();
@@ -142,8 +160,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_LAT, location.getLatitude()+"");
         values.put(KEY_LON, location.getLongitude()+"");
         values.put(KEY_DATE, date+"");
-        values.put(LOCATIONS_KEY_SPEED, location.getSpeed()+"");
-        values.put(LOCATIONS_KEY_SENDED, "0");
+        values.put(KEY_SPEED, location.getSpeed()+"");
+        values.put(KEY_SENT, "0");
         long a;
         a=this.getWritableDatabase().insert(TABLE_LOCATIONS,null,values);
         int aa=10;
@@ -172,7 +190,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<MyLocation> getUnsentLocations(){
-        final Cursor cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_LOCATIONS  + " WHERE " + LOCATIONS_KEY_SENDED + "='0'", null);
+        final Cursor cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_LOCATIONS  + " WHERE " + KEY_SENT + "='0'", null);
         ArrayList<MyLocation> loc_list = new ArrayList<MyLocation>();
         MyLocation location=null;
 
@@ -183,7 +201,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     location = new MyLocation("ali");
                     location.setLatitude(Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_LAT))));
                     location.setLongitude(Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_LON))));
-                    location.setSpeed(Float.parseFloat(cursor.getString(cursor.getColumnIndex(LOCATIONS_KEY_SPEED))));
+                    location.setSpeed(Float.parseFloat(cursor.getString(cursor.getColumnIndex(KEY_SPEED))));
                     location.setRecord_id(Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_ID))));
                     location.setDate(cursor.getString(cursor.getColumnIndex(KEY_DATE)));
 
@@ -225,7 +243,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Location location = new Location("ali");
                     location.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LAT)));
                     location.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LON)));
-                    location.setSpeed(cursor.getFloat(cursor.getColumnIndex(LOCATIONS_KEY_SPEED)));
+                    location.setSpeed(cursor.getFloat(cursor.getColumnIndex(KEY_SPEED)));
                     Bundle bundle = new Bundle();
                     bundle.putString("date",cursor.getString(cursor.getColumnIndex(KEY_DATE)));
                     location.setExtras(bundle);
@@ -268,7 +286,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Location location = new Location("ali");
                     location.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LAT)));
                     location.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LON)));
-                    location.setSpeed(cursor.getFloat(cursor.getColumnIndex(LOCATIONS_KEY_SPEED)));
+                    location.setSpeed(cursor.getFloat(cursor.getColumnIndex(KEY_SPEED)));
                     Bundle bundle = new Bundle();
                     bundle.putString("date",cursor.getString(cursor.getColumnIndex(KEY_DATE)));
                     location.setExtras(bundle);
@@ -355,5 +373,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return favoritePoints;
 
+    }
+
+    public ArrayList<Fuel> getAllFuel(String key) {
+        final Cursor cursor;
+        if (key==null || key=="")
+            cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_FEUL , null);
+        else
+            cursor =  this.getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_FEUL+" WHERE "+KEY_LITER+" LIKE '"+key+"%'" , null);
+
+        ArrayList<Fuel> fuels = new ArrayList<Fuel>();
+
+        if (cursor != null) {
+            if(cursor.moveToFirst()) {
+
+                do{
+                    Fuel fuel = new Fuel(
+                            cursor.getString(cursor.getColumnIndex(KEY_DATE)),
+                            cursor.getString(cursor.getColumnIndex(KEY_LITER))
+                    );
+
+                    fuels.add(fuel);
+
+                }while(cursor.moveToNext());
+
+            }
+        }
+        return fuels;
     }
 }

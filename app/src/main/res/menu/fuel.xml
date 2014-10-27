@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.graphhopper.android.Activities.FuelActivity" >
+
+    <item android:id="@+id/fuel_add"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        android:icon="@drawable/add"
+        android:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_item_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:showAsAction="always"
+        android:title="search"
+    />
+
+
+</menu>

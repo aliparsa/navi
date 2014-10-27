@@ -86,11 +86,7 @@
             android:label="@string/title_activity_search_poi"
             android:screenOrientation="landscape" >
         </activity>
-        <activity
-            android:name=".Activities.FeulActivity"
-            android:label="@string/title_activity_feul"
-            android:screenOrientation="landscape" >
-        </activity>
+
         <activity
             android:name=".Activities.MovementHistoryActivity"
             android:label="@string/title_activity_movement_history"
@@ -98,8 +94,14 @@
         </activity>
         <activity
             android:name=".Activities.FavoritePointActivity"
+            android:label="@string/title_activity_private_poi"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".Activities.FuelActivity"
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
             android:screenOrientation="landscape"
-            android:label="@string/title_activity_private_poi" >
+            android:label="@string/title_activity_fuel" >
         </activity>
     </application>
 

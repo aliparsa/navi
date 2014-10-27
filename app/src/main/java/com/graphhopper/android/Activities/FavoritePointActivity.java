@@ -135,10 +135,11 @@ public class FavoritePointActivity extends Activity {
     public void loadAndShowFavoritePoints(String key){
         DatabaseHelper db = new DatabaseHelper(context);
         ArrayList<FavoritePoint> allFavoritePoint = db.getAllFavoritePoint(key);
-        if (allFavoritePoint.size()>0) {
+
+
             ListViewCustomAdapter adapter = new ListViewCustomAdapter(context, 0, allFavoritePoint);
             lv.setAdapter(adapter);
             searchView.requestFocus();
-        }
+
     }
 }

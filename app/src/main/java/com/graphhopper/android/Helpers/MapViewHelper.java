@@ -16,4 +16,6 @@ public class MapViewHelper {
     public static void animateToPoint(MapView mapView, double lat, double lon) {
         mapView.getModel().mapViewPosition.animateTo(new LatLong(lat, lon));
     }
+
+
 }
