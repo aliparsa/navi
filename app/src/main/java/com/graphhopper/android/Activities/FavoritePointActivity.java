@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -36,23 +37,6 @@ public class FavoritePointActivity extends Activity {
         setContentView(R.layout.activity_messaging);
         context = this;
         lv = (ListView) findViewById(R.id.listView);
-
-        searchView = new SearchView(context);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                loadAndShowFavoritePoints(s);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                loadAndShowFavoritePoints(s);
-                return false;
-            }
-        });
-        lv.addHeaderView(searchView);
-
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -105,29 +89,8 @@ public class FavoritePointActivity extends Activity {
 
 
 
-
-
         loadAndShowFavoritePoints(null);
 
-    }
-
-
-    private void showMessageAsDialog(Message message) {
-        new AlertDialog.Builder(this)
-                .setTitle(message.getX1())
-                .setMessage(message.getX2())
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // continue with delete
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
     }
 
 
@@ -142,4 +105,27 @@ public class FavoritePointActivity extends Activity {
             searchView.requestFocus();
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.private_poi, menu);
+        searchView = (SearchView) menu.findItem(R.id.po_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                loadAndShowFavoritePoints(s);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                loadAndShowFavoritePoints(s);
+                return false;
+            }
+        });
+
+        return true;
+    }
+
 }

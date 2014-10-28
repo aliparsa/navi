@@ -49,9 +49,9 @@ public class FuelActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
 
-                //Message message = (Message) ((ListViewCustomAdapter.DrawerItemHolder) view.getTag()).getTag();
+                Fuel fuel = (Fuel) ((ListViewCustomAdapter.DrawerItemHolder) view.getTag()).getTag();
                 //showMessageAsDialog(message);
-                //Toast.makeText(context,message.getX1(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,fuel.getLiter(),Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -76,8 +76,6 @@ public class FuelActivity extends Activity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.fuel, menu);
         searchView = (SearchView) menu.findItem(R.id.menu_item_search).getActionView();
-
-
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
