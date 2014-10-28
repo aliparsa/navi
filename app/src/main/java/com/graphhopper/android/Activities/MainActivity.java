@@ -47,6 +47,7 @@ import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.android.DataModel.FavoritePoint;
 import com.graphhopper.android.DataModel.Message;
+import com.graphhopper.android.DataModel.Setting;
 import com.graphhopper.android.DataModel.Task;
 import com.graphhopper.android.DataModel.Taximeter;
 import com.graphhopper.android.DataModel.VoiceFlags;
@@ -160,96 +161,9 @@ public class MainActivity extends Activity {
     private boolean lockOnGps = false;
     private GpsStatusListener gpsStatusListener;
     private LatLong lastGPSLocation;
-    private LocationListener listener = new LocationListener() {
 
 
-        @Override
-        public void onLocationChanged(Location location) {
 
-            loc_lastKnowLocation = location;
-
-            updateGpsStateIcon(GpsState.connected);
-
-            updateSpeedValue(location);
-
-            updateDistanceValue(location);
-
-
-            // send location to store in taximeters
-            putLocationToActiveTaximeters(location);
-
-            if (newLocationEventInProgress) {
-                log.append("new location event ignored\n");
-                return;
-            }
-
-            newLocationEventInProgress = true;
-
-            try {
-
-                log.append("new lat lon\n");
-                // if we lock on gps we navigate to new position
-                if (lockOnGps)
-                    MapViewHelper.animateToPoint(mapView, location.getLatitude(), location.getLongitude());
-
-                // get last location
-                lastGPSLocation = new LatLong(location.getLatitude(), location.getLongitude());
-                lastKnowLocation = new LatLong(location.getLatitude(), location.getLongitude());
-
-
-                if (isInRoutingMode) {
-                    // we are in routing mode
-                    log.append("we are in routing mode\n");
-
-
-                    if (!isReady()) {
-                        log.append("no ready >ret\n");
-                        return;
-                    }
-
-                    if (shortestPathRunning) {
-                        log.append("route in running >ret\n");
-                        return;
-                    }
-
-                    shortestPathRunning = true;
-                    log.append("req new route from lat: " + location.getLatitude() + " lon: " + location.getLongitude() + " to lat: " + end.latitude + " lon: " + end.longitude + "\n");
-                    calcPath(location.getLatitude(), location.getLongitude(), end.latitude, end.longitude);
-
-                } else {
-                    // we are not in routing mode
-                    // show new current point on map
-                    log.append("NOT in routing mode\n");
-                    MapViewHelper.clearMapView(mapView);
-                    DrawOnMapHelper.showImgOnThisPoint(context, lastKnowLocation, mapView, R.drawable.blue_circle);
-                }
-
-
-            } catch (Exception e) {
-                logUser(e.getMessage());
-                newLocationEventInProgress = false;
-            }
-
-            newLocationEventInProgress = false;
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            btnGpsStatus.setBackgroundColor(Color.GRAY);
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            btnGpsStatus.setBackgroundColor(Color.YELLOW);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            //satlateInView.setText(gpsStatusListener.getSatlateInView()+"");
-
-
-        }
-    };
     private float lastAzimuth = 0;
     private int oldDayOfYear = -1;
     private Location oldLocation;
@@ -258,6 +172,8 @@ public class MainActivity extends Activity {
     private double LastRouteLat;
     private double LastRouteLon;
     private boolean DuringShowHistory = false;
+    private boolean ShowingHistory;
+    private Button btnFuelManagement;
 
     protected boolean onMapTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
 
@@ -384,8 +300,7 @@ public class MainActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-
-        context = this;
+        context = getApplicationContext();
         AndroidGraphicFactory.createInstance(getApplication());
 
 
@@ -451,7 +366,8 @@ public class MainActivity extends Activity {
         });
 
 
-        //setting = new Setting(this);
+        Setting setting = new Setting(context);
+
 
         llDirectionList = (LinearLayout) findViewById(R.id.directionList);
 
@@ -728,6 +644,33 @@ public class MainActivity extends Activity {
 
         showToast("Battery Level " + BattryHelper.getBatteryLevel(context) + "");
 
+
+        final Button btnStopShowHistory = (Button) findViewById(R.id.btnStopShowHistory);
+        btnStopShowHistory.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnStopShowHistory.setVisibility(View.GONE);
+                ShowingHistory = false;
+
+                MapViewHelper.clearMapView(mapView);
+                DrawOnMapHelper.showImgOnThisPoint(context,new LatLong(loc_lastKnowLocation.getLatitude(),loc_lastKnowLocation.getLongitude()),mapView,R.drawable.blue_circle);
+                MapViewHelper.animateToPoint(mapView, loc_lastKnowLocation.getLatitude(), loc_lastKnowLocation.getLongitude());
+            }
+        });
+
+
+        btnFuelManagement = (Button) findViewById(R.id.btnFuelManagement);
+        btnFuelManagement.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context,FuelActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+
         final Button btnLocationHistory = (Button) findViewById(R.id.btnLocationHistory);
         btnLocationHistory.setOnClickListener(new OnClickListener() {
             @Override
@@ -763,15 +706,16 @@ public class MainActivity extends Activity {
                                 int selectedPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
                                 // Do something useful withe the position of the selected radio button
                                 lockOnGps = false;
-                                DuringShowHistory = true;
+                                ShowingHistory = true;
                                 DatabaseHelper db = new DatabaseHelper(context);
                                 ArrayList<Location> locations = db.getLocationsOfDay(EnDays.get(selectedPosition));
                                 if (locations.size() > 1) {
                                     MapViewHelper.clearMapView(mapView);
                                     DrawOnMapHelper.drawPolyLineByLocations(mapView, locations);
+                                    btnStopShowHistory.setVisibility(View.VISIBLE);
                                 } else {
                                     showToast("موردی برای نمایش موجود نیست");
-                                    DuringShowHistory = false;
+                                    ShowingHistory = false;
                                 }
                             }
                         })
@@ -1411,5 +1355,98 @@ public class MainActivity extends Activity {
         }
     }
 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    private LocationListener listener = new LocationListener() {
+
+
+        @Override
+        public void onLocationChanged(Location location) {
+
+            loc_lastKnowLocation = location;
+
+            updateGpsStateIcon(GpsState.connected);
+
+            updateSpeedValue(location);
+
+            updateDistanceValue(location);
+
+
+            // send location to store in taximeters
+            putLocationToActiveTaximeters(location);
+
+            if (newLocationEventInProgress) {
+                log.append("new location event ignored\n");
+                return;
+            }
+
+            newLocationEventInProgress = true;
+
+            try {
+
+                log.append("new lat lon\n");
+
+                // if we lock on gps we navigate to new position
+                if (lockOnGps && !ShowingHistory)
+                    MapViewHelper.animateToPoint(mapView, location.getLatitude(), location.getLongitude());
+
+                // get last location
+                lastGPSLocation = new LatLong(location.getLatitude(), location.getLongitude());
+                lastKnowLocation = new LatLong(location.getLatitude(), location.getLongitude());
+
+                // if we are in routing mode
+                if (isInRoutingMode) {
+                    log.append("we are in routing mode\n");
+
+                    if (!isReady()) {
+                        log.append("no ready >ret\n");
+                        return;
+                    }
+
+                    if (shortestPathRunning) {
+                        log.append("route in running >ret\n");
+                        return;
+                    }
+
+                    shortestPathRunning = true;
+                    log.append("req new route from lat: " + location.getLatitude() + " lon: " + location.getLongitude() + " to lat: " + end.latitude + " lon: " + end.longitude + "\n");
+                    calcPath(location.getLatitude(), location.getLongitude(), end.latitude, end.longitude);
+
+                } else {
+                    // we are not in routing mode
+                    // show new current point on map
+                    if (!ShowingHistory){
+                    log.append("NOT in routing mode\n");
+                    MapViewHelper.clearMapView(mapView);
+                    DrawOnMapHelper.showImgOnThisPoint(context, lastKnowLocation, mapView, R.drawable.blue_circle);
+                    }
+                }
+
+
+            } catch (Exception e) {
+                logUser(e.getMessage());
+                newLocationEventInProgress = false;
+            }
+
+            newLocationEventInProgress = false;
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            btnGpsStatus.setBackgroundColor(Color.GRAY);
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            btnGpsStatus.setBackgroundColor(Color.YELLOW);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            //satlateInView.setText(gpsStatusListener.getSatlateInView()+"");
+
+
+        }
+    };
 
 }
