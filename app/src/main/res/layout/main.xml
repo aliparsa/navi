@@ -229,24 +229,38 @@
                 android:textColor="@color/white"
                 />
 
-            <view
+            <View
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
-                android:background="@color/gray">
-
-                </view>
+                android:background="@color/gray"/>
 
             <Button
                 android:id="@+id/btnFavoritePoint"
                 android:layout_width="fill_parent"
                 android:layout_height="85dp"
-                android:text="نقطه مکان ها" />
+                android:text="نقطه مکان ها"
+                android:background="@android:color/transparent"
+                android:textColor="@color/white"
+                />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray"/>
 
             <Button
                 android:id="@+id/btnLocationHistory"
                 android:layout_width="fill_parent"
                 android:layout_height="85dp"
-                android:text="تاریخچه حرکت" />
+                android:text="تاریخچه حرکت"
+                android:background="@android:color/transparent"
+                android:textColor="@color/white"
+                />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray"/>
 
             </LinearLayout>
     </ScrollView>
