@@ -73,7 +73,7 @@
 
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:background="#7cfff6a8">
+        android:background="@color/black">
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -214,7 +214,7 @@
         android:layout_width="80dp"
         android:layout_height="fill_parent"
         android:layout_above="@+id/horizontalScrollView"
-        android:background="#7cfff6a8" >
+        android:background="@color/black" >
 
         <LinearLayout
             android:orientation="vertical"
@@ -224,7 +224,17 @@
                 android:id="@+id/btnSearchPOI"
                 android:layout_width="fill_parent"
                 android:layout_height="85dp"
-                android:text="Search POI" />
+                android:text="Search POI"
+                android:background="@android:color/transparent"
+                android:textColor="@color/white"
+                />
+
+            <view
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray">
+
+                </view>
 
             <Button
                 android:id="@+id/btnFavoritePoint"
@@ -247,7 +257,7 @@
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="#7cfff6a8" >
+        android:background="@color/black" >
 
 
 
