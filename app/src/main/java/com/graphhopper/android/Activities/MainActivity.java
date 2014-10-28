@@ -300,7 +300,7 @@ public class MainActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        context = getApplicationContext();
+        context = this;
         AndroidGraphicFactory.createInstance(getApplication());
 
 

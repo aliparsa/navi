@@ -16,11 +16,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.graphhopper.android.DataModel.FavoritePoint;
+import com.graphhopper.android.DataModel.Fuel;
 import com.graphhopper.android.DataModel.Message;
 import com.graphhopper.android.R;
 
 
 import com.graphhopper.android.DataModel.AdapterInputType;
+
+import org.mapsforge.map.rendertheme.renderinstruction.Line;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +51,7 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
 
     LinearLayout ll_message;
     LinearLayout ll_favorite_point;
+    LinearLayout ll_fuel;
 
 
     public ListViewCustomAdapter(Context context, int layoutResourceID,
@@ -86,6 +90,7 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
 
             ll_message = (LinearLayout) view.findViewById(R.id.ll_message);
             ll_favorite_point = (LinearLayout) view.findViewById(R.id.ll_FavoritePoint);
+            ll_fuel = (LinearLayout) view.findViewById(R.id.ll_fuel);
         }
 
 
@@ -110,6 +115,14 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
             OnlyShow(ll_favorite_point);
         }
 
+        Fuel fuel;
+        if (item instanceof Fuel) {
+            fuel = (Fuel) item;
+            holder.setTag(fuel);
+            getFuelItem(holder, fuel);
+            OnlyShow(ll_fuel);
+        }
+
 
         view.setTag(holder);
 
@@ -120,6 +133,7 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
     public void OnlyShow(LinearLayout lv) {
         ll_message.setVisibility(View.GONE);
         ll_favorite_point.setVisibility(View.GONE);
+        ll_fuel.setVisibility(View.GONE);
 
         lv.setVisibility(LinearLayout.VISIBLE);
     }
@@ -153,6 +167,20 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
     }
 
 
+    private void getFuelItem(DrawerItemHolder holder, Fuel item) {
+
+        if (holder.fuelTitle == null)
+            holder.fuelTitle = (TextView) ll_fuel.findViewById(R.id.fuel_title);
+
+        if (holder.fuelSubtitle == null)
+            holder.fuelSubtitle = (TextView) ll_fuel.findViewById(R.id.fuel_subtitle);
+
+
+        holder.fuelTitle.setText(item.getLiter());
+        holder.fuelSubtitle.setText(item.getLiter());
+    }
+
+
 
     public static class DrawerItemHolder {
 
@@ -167,6 +195,11 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
         // FavoritePoint Item ------------
         TextView favoritePointTitle;
         TextView favoritePointSubtitle;
+
+        // FavoritePoint Item ------------
+        TextView fuelTitle;
+        TextView fuelSubtitle;
+
 
 
         public Object getTag() {

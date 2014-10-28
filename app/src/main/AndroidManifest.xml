@@ -94,6 +94,7 @@
         </activity>
         <activity
             android:name=".Activities.FavoritePointActivity"
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
             android:label="@string/title_activity_private_poi"
             android:screenOrientation="landscape" >
         </activity>
