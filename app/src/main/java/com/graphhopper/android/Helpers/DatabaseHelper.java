@@ -70,7 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
 
-        String CREATE_CONTACTS_TABLE =
+        String CREATE_LOCATIONS_TABLE =
                 "CREATE TABLE " + TABLE_LOCATIONS + "("
                         + KEY_ID + " INTEGER PRIMARY KEY,"
                         + KEY_LAT + " TEXT,"
@@ -79,7 +79,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         + KEY_SPEED + " TEXT,"
                         + KEY_SENT + " TEXT"
                         + ")";
-        db.execSQL(CREATE_CONTACTS_TABLE);
+        db.execSQL(CREATE_LOCATIONS_TABLE);
 
 
         String CREATE_FAVORITE_POINT_TABLE =
@@ -334,8 +334,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return messageArrayList;
     }
-
-
 
     public ArrayList<FavoritePoint> getAllFavoritePoint(String key) {
 

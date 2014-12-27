@@ -77,6 +77,7 @@ import com.graphhopper.util.Helper;
 import com.graphhopper.util.ProgressListener;
 import com.graphhopper.util.StopWatch;
 
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.model.LatLong;
@@ -135,7 +136,8 @@ public class MainActivity extends Activity {
     Button btnSetting;
     Button btnMessaging;
     Button btnPinOnGps;
-    Button btnFavoritePoint;
+    ImageView btnFavoritePoint;
+    ImageView btnTaximeter;
     VoiceFlags voiceFlags;
     private MapView mapView;
     private GraphHopper hopper;
@@ -345,6 +347,8 @@ public class MainActivity extends Activity {
         localButton = (Button) findViewById(R.id.locale_button);
         remoteSpinner = (Spinner) findViewById(R.id.remote_area_spinner);
         remoteButton = (Button) findViewById(R.id.remote_button);
+
+
         // TODO get user confirmation to download
         // if (AndroidHelper.isFastDownload(this))
 
@@ -355,7 +359,9 @@ public class MainActivity extends Activity {
 
         // ali code start from here
 
-        btnFavoritePoint = (Button) findViewById(R.id.btnFavoritePoint);
+
+
+        btnFavoritePoint = (ImageView) findViewById(R.id.imgvFavoritePoint);
         btnFavoritePoint.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -508,7 +514,7 @@ public class MainActivity extends Activity {
 
         //Toast.makeText(context,locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).toString(),Toast.LENGTH_SHORT).show();
 
-        Location lastloc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        final Location lastloc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         if (lastloc != null)
             lastKnowLocation = new LatLong(lastloc.getLatitude(), lastloc.getLongitude());
@@ -639,10 +645,12 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 showToast("موقعیت و درخواست شما به مرکز ارسال شد");
+                sos(lastloc);
+
             }
         });
 
-        showToast("Battery Level " + BattryHelper.getBatteryLevel(context) + "");
+        //showToast("Battery Level " + BattryHelper.getBatteryLevel(context) + "");
 
 
         final Button btnStopShowHistory = (Button) findViewById(R.id.btnStopShowHistory);
@@ -671,7 +679,7 @@ public class MainActivity extends Activity {
 
 
 
-        final Button btnLocationHistory = (Button) findViewById(R.id.btnLocationHistory);
+        final ImageView btnLocationHistory = (ImageView) findViewById(R.id.btnLocationHistory);
         btnLocationHistory.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -748,6 +756,12 @@ public class MainActivity extends Activity {
        // ali code end here
 
 
+    }
+
+    private void sos(Location lastloc) {
+        Intent intent = new Intent(this, ConnectionService.class);
+        intent.putExtra("sos_location",lastloc);
+        startService(intent);
     }
 
     private void showToast(String s) {
@@ -1060,8 +1074,12 @@ public class MainActivity extends Activity {
                         LastRouteLon = lastRouteResponce.getInstructions().get(0).getPoints().getLon(0);
                     }
 
+                    Setting setting = new Setting(context);
+
+                    if(setting.getTextInstructionStatus())
                     TextInstructionsHelper.createAndShowInstructionList(context, lastRouteResponce, llDirectionList, mapView, layerCount);
 
+                    if(setting.getVoiceInstructionStatus())
                     VoiceInstructionsHelper.createAndPlayVoiceCommand(context, lastRouteResponce, voiceFlags);
 
 
@@ -1169,7 +1187,7 @@ public class MainActivity extends Activity {
             double betweenDistance = GpsHelper.distance(oldLocation, location);
             todayDistance += betweenDistance;
             Button speed = (Button) findViewById(R.id.btnDistance);
-            speed.setText("مصافت پیموده شده امروز" + "\n" + (int) todayDistance + " m");
+            speed.setText("مصافت امروز" + "\n" + (int) todayDistance + " m");
             oldDayOfYear = newDayOfYear;
             oldLocation = location;
         }
@@ -1266,6 +1284,8 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
         {
             final Task task = ((Task) intent.getSerializableExtra("TASK"));
+            DatabaseHelper db = new DatabaseHelper(context);
+            db.insertMessage(new Message("task",task.getFromLat()+"",task.getFromLon()+"",task.getToLat()+"",task.getToLon()+"",task.getDescription()+"",task.getDate()+"","","",""));
             new AlertDialog.Builder(context)
                     .setTitle("ماموریت جدید دریافت شد")
                     .setMessage("fromlat:" + task.getFromLat() + "\n" + "fromlon:" + task.getFromLon() + "\n" + "tolat:" + task.getToLat() + "\n" + "tolon:" + task.getToLat() + "\n" + "description:" + task.getDescription() + "\n" + "\n" + "date:" + task.getDate())
@@ -1448,5 +1468,10 @@ public class MainActivity extends Activity {
 
         }
     };
+
+
+    public void sendDataToServer(BasicNameValuePair nameValuePair){
+
+    }
 
 }

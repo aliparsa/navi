@@ -115,6 +115,7 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
             OnlyShow(ll_favorite_point);
         }
 
+
         Fuel fuel;
         if (item instanceof Fuel) {
             fuel = (Fuel) item;
@@ -176,8 +177,8 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
             holder.fuelSubtitle = (TextView) ll_fuel.findViewById(R.id.fuel_subtitle);
 
 
-        holder.fuelTitle.setText(item.getLiter());
-        holder.fuelSubtitle.setText(item.getLiter());
+        holder.fuelTitle.setText(item.getLiter()+" لیتر ");
+        holder.fuelSubtitle.setText(" در تاریخ "+item.getDate());
     }
 
 

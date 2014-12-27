@@ -16,12 +16,12 @@ public class TaximeterHelper {
                 .setTitle("محاسبه هزینه")
                 .setMessage("مدت زمان سپری شده" + " : " + TimeHelper.convertSecToStr(taximeter.timer) + "\n" +
                         " مسافت " + " : " + taximeter.getRouteDistance())
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                .setPositiveButton("تایید", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // continue with delete
                     }
                 })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                .setNegativeButton("لغو", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // do nothing
                     }

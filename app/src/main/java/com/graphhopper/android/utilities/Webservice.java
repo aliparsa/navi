@@ -2,6 +2,8 @@ package com.graphhopper.android.utilities;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 
@@ -25,12 +27,49 @@ public class Webservice {
 
     //final static public String SERVER_ADDRESS = "http://192.168.1.66:8099/";
     //final static public String SERVER_ADDRESS = "http://ict.farsportal.com/android/locgetter.php";
-    final static public String SERVER_ADDRESS = "http://79.175.166.110:8080";
+    static public String SERVER_ADDRESS = "http://79.175.166.110:8080";
+
+    static public String SOCKET_ADDRESS = "http://79.175.166.110:8080";
 
 
 
+    public static void prepareServerAddress(Context context) {
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String server_address = preferences.getString("server_address", null);
+
+        if (server_address != null) {
+            SERVER_ADDRESS = server_address;
+        } else {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("server_address", SERVER_ADDRESS);
+            editor.apply();
+        }
+
+
+    }
+    // - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - ]
+    public static void prepareSocketAddress(Context context) {
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String socket_address = preferences.getString("socket_address", null);
+
+        if (socket_address != null) {
+            SOCKET_ADDRESS = socket_address;
+        } else {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("socket_address", SOCKET_ADDRESS);
+            editor.apply();
+        }
+
+
+    }
     //------------------------------------------------------------------------------
     public static void sendDataToServer(Context context,BasicNameValuePair[] arr, final CallBack<ServerResponse> callBack) {
+
+        prepareServerAddress(context);
         HttpHelper helper = new HttpHelper(context, SERVER_ADDRESS, false, 0);
 
         // sample arr
@@ -78,4 +117,33 @@ public class Webservice {
     }
 
 
+    public static String getServerAddress() {
+        return SERVER_ADDRESS;
+    }
+
+    public static String getSocketAddress(Context context) {
+        init(context);
+        return SOCKET_ADDRESS;
+    }
+
+    public static void modifyServerAddress(String s, Context context) {
+        SERVER_ADDRESS=s;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("server_address", s);
+        editor.apply();
+    }
+
+    public static void modifySocketAddress(String s, Context context) {
+        SOCKET_ADDRESS=s;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("socket_address", s);
+        editor.apply();
+    }
+
+    public static void init(Context context) {
+        prepareServerAddress(context);
+        prepareSocketAddress(context);
+    }
 }

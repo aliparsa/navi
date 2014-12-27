@@ -100,9 +100,9 @@ public class FavoritePointActivity extends Activity {
         ArrayList<FavoritePoint> allFavoritePoint = db.getAllFavoritePoint(key);
 
 
-            ListViewCustomAdapter adapter = new ListViewCustomAdapter(context, 0, allFavoritePoint);
+        ListViewCustomAdapter adapter = new ListViewCustomAdapter(context, 0, allFavoritePoint);
             lv.setAdapter(adapter);
-            searchView.requestFocus();
+
 
     }
 

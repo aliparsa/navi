@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.graphhopper.android.DataModel.MyLocation;
 import com.graphhopper.android.DataModel.ServerResponse;
+import com.graphhopper.android.Helpers.DeviceInfoHelper;
 import com.graphhopper.android.Interfaces.CallBack;
 import com.graphhopper.android.Activities.MainActivity;
 import com.graphhopper.android.Helpers.DatabaseHelper;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
  */
 public class LocationSenderService extends Service {
 
+    public static final String LOCATIONS_LIST = "LOCATIONS_LIST";
     PowerManager.WakeLock wakeLock;
 
 
@@ -67,7 +69,7 @@ public class LocationSenderService extends Service {
                     try {
                         //checkAndSendPointToServer();
                         SendAllUnsentPoint();
-                        Thread.sleep(60000);
+                        Thread.sleep(5000);
                     }
                     catch (Exception e){
                         e.printStackTrace();
@@ -91,6 +93,8 @@ public class LocationSenderService extends Service {
             return;
 
         int maxId = -1;
+
+        String jsonDeviceId = "\"device_id\":"+ DeviceInfoHelper.getDevice_id();
         String json = "[";
 
 
@@ -105,8 +109,8 @@ public class LocationSenderService extends Service {
                     json+="\"lat\":\""+loc.getLatitude()+"\",";
                     json+="\"lon\":\""+loc.getLongitude()+"\",";
                     json+="\"speed\":\""+loc.getSpeed()+"\",";
-                    json+="\"date\":\""+loc.getDate()+"\",";
-                    json+="\"device_id\":\""+loc.getDevice_id()+"\"";
+                    json+="\"date\":\""+loc.getDate()+"\"";
+                  //  json+="\"device_id\":\""+"10"+"\"";
 
             json+="}";
 
@@ -115,6 +119,12 @@ public class LocationSenderService extends Service {
         }
 
         json+="]";
+
+        String finalJson = "[{"+jsonDeviceId+","+"\"locations\":"+json+"}]";
+
+
+        //BroadcastLocationsList(json);
+        BroadcastLocationsList(finalJson);
 
 
         BasicNameValuePair[] arr = {
@@ -162,4 +172,17 @@ public class LocationSenderService extends Service {
 
         }
     }*/
+
+    private void BroadcastLocationsList(String jsonLocationsList)//this method sends broadcast messages
+    {
+        try {
+
+            Intent intent = new Intent(getApplicationContext(),ConnectionService.class);
+            intent.putExtra("locations", jsonLocationsList);
+            startService(intent);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

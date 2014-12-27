@@ -3,6 +3,7 @@ package com.graphhopper.android.Services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.location.Location;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -10,8 +11,10 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.graphhopper.android.DataModel.Task;
+import com.graphhopper.android.Helpers.DeviceInfoHelper;
 
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 
@@ -24,8 +27,9 @@ public class ConnectionService extends Service {
     Socket socket;
     public final static String CONNECTION_SERVICE_INTENT="CONNECTION_SERVICE_INTENT";
     public final static String CONNECTION_STATUS="CONNECTION_STATUS";
-    private final String SERVER_ADDRESS = "http://79.175.166.110:8080";
+    private final String SOCKET_ADDRESS = "http://192.168.0.76:8888";
     private final long RECONNECT_SLEEP_TIME = 3000;
+    private boolean isSocketConnected = false;
 
     @Override
     public void onCreate() {
@@ -38,6 +42,33 @@ public class ConnectionService extends Service {
         startConnection();
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        try{
+
+        if (intent.hasExtra("locations")) {
+            String json = intent.getStringExtra("locations");
+            if (isSocketConnected)
+                socket.emit("locations", new JSONArray(json));
+        }
+
+        if (intent.hasExtra("sos_location")) {
+            Location sos_location = (Location) intent.getParcelableExtra("sos_location");
+            JSONObject json = new JSONObject("{\"device_id\":"+ DeviceInfoHelper.getDevice_id()+",\"tag\":\"sos\",\"lat\":"+sos_location.getLatitude()+",\"lon\":"+sos_location.getLongitude()+"}");
+             if (isSocketConnected)
+              socket.emit("sos_location", json);
+        }
+
+        } catch (Exception e) {
+e.printStackTrace();
+        }
+
+
+        return super.onStartCommand(intent, flags, startId);
+
+    }
+
     private void startConnection() {
 
         try{
@@ -46,16 +77,17 @@ public class ConnectionService extends Service {
             opts.reconnection = true;
             opts.timeout = 15000;
 
-            socket = IO.socket(SERVER_ADDRESS, opts);
+            socket = IO.socket(SOCKET_ADDRESS, opts);
 
             socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
 
                     try {
-                        socket.emit("introduce", new JSONObject("{\"device_id\":\"2\"}"));
+                        socket.emit("introduce", new JSONObject("{\"device_id\":\"5\"}"));
 
-                        Log.i("ashkan", "socket connected to " + SERVER_ADDRESS);
+                        Log.i("ashkan", "socket connected to " + SOCKET_ADDRESS);
+                        isSocketConnected=true;
                         sendConnectionStatusIntent(1);
 
                     }catch (Exception e){
@@ -70,14 +102,15 @@ public class ConnectionService extends Service {
 
                     try {
                         JSONObject obj = (JSONObject) args[0];
-                        String StrJsonObject  = (String) args[0];
+                        //String StrJsonObject  = (String) args[0];
                         broadcastObject(obj);
-                        broadcast(StrJsonObject);
+                        //broadcast(StrJsonObject);
                         Log.i("ashkan", "socket new message news recieved");
 
                         //sendNotification("hello", obj.getString("hello"));
                     }catch (Exception e){
 
+                        int x = 0;
                     }
                 }
             });
@@ -87,6 +120,7 @@ public class ConnectionService extends Service {
                 public void call(Object... args) {
 
                     Log.i("ashkan", "socket connection error");
+                    isSocketConnected=false;
                     sendConnectionStatusIntent(2);
                     Log.i("ashkan", "thread sleep before reconnect");
 
@@ -108,6 +142,7 @@ public class ConnectionService extends Service {
                 public void call(Object... args) {
 
                     Log.i("ashkan", "socket dissconnected");
+                    isSocketConnected=false;
                     sendConnectionStatusIntent(2);
 
                     Log.i("ashkan", "thread sleep before reconnect");
@@ -130,6 +165,7 @@ public class ConnectionService extends Service {
                 public void call(Object... args) {
 
                     Log.i("ashkan", "socket reconnected");
+                    isSocketConnected=true;
                     sendConnectionStatusIntent(1);
                 }
             });
@@ -230,6 +266,10 @@ public class ConnectionService extends Service {
         Connected,Disconnected,Connecting
     }
 
+
+
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
 }

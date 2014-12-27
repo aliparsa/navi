@@ -17,14 +17,22 @@ import android.preference.PreferenceManager;
 
 
 public class Setting {
-    public final String ON = "ON";
-    public final String OFF = "OFF";
+    public final boolean ON = true;
+    public final boolean OFF = false;
     public final String TAXIMETER = "TAXIMETER";
     public final String VOICE_INSTRUCTION = "VOICE_INSTRUCTION";
     public final String TEXT_INSTRUCTION = "TEXT_INSTRUCTION";
+    public final String SERVER_ADDRESS = "SERVER_ADDRESS";
+    public final String SOCKET_ADDRESS = "SOCKET_ADDRESS";
 
-    public static String voice;
-    public static String taximeter;
+
+    public static boolean voice;
+    public static boolean text;
+    public static boolean taximeter;
+    public static String serverAddress;
+    public static String socketAddress;
+
+
     Context context;
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
@@ -39,55 +47,67 @@ public class Setting {
     private void loadSetting() {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        editor = preferences.edit();
+
+        if (!preferences.contains(VOICE_INSTRUCTION)) {
+            editor = preferences.edit();
+            editor.putBoolean(VOICE_INSTRUCTION, OFF);
+            editor.commit();
+        } else
+            Setting.voice = preferences.getBoolean(VOICE_INSTRUCTION, OFF);
 
 
-        if (!preferences.contains(VOICE_INSTRUCTION))
-            editor.putString(VOICE_INSTRUCTION, OFF);
-        else
-            Setting.voice = preferences.getString(VOICE_INSTRUCTION, OFF);
-
-
-        if (!preferences.contains(TEXT_INSTRUCTION))
-            editor.putString(TEXT_INSTRUCTION, OFF);
-        else
-            Setting.voice = preferences.getString(TEXT_INSTRUCTION, OFF);
-
+        if (!preferences.contains(TEXT_INSTRUCTION)) {
+            editor = preferences.edit();
+            editor.putBoolean(TEXT_INSTRUCTION, OFF);
+            editor.commit();
+        } else
+            Setting.text = preferences.getBoolean(TEXT_INSTRUCTION, OFF);
 
 
         if (!preferences.contains(TAXIMETER))
-            editor.putString(TAXIMETER, OFF);
-        else
-            Setting.taximeter = preferences.getString(TAXIMETER, OFF);
+        {
+            editor = preferences.edit();
+            editor.putBoolean(TAXIMETER, OFF);
+        editor.commit();
+    }else
+            Setting.taximeter = preferences.getBoolean(TAXIMETER, OFF);
+
 
 
 
 
     }
 
-    public void setVoiceInstructionOn(){
-        editor.putString(VOICE_INSTRUCTION,ON);
+    public void setVoiceInstruction(boolean status){
+        editor = preferences.edit();
+        editor.putBoolean(VOICE_INSTRUCTION, status);
+        editor.commit();
     }
 
-    public void setVoiceInstructionOff(){
-        editor.putString(VOICE_INSTRUCTION,OFF);
+    public void setTaximeter(boolean status){
+        editor = preferences.edit();
+        editor.putBoolean(TAXIMETER, status);
+        editor.commit();
     }
 
-    public void setTaximeterOn(){
-        editor.putString(TAXIMETER,ON);
+    public void setTextInstruction(boolean status){
+        editor = preferences.edit();
+        editor.putBoolean(TEXT_INSTRUCTION, status);
+        editor.commit();
     }
 
-    public void setTaximeterOff(){
-        editor.putString(TAXIMETER,OFF);
+
+
+    public boolean getVoiceInstructionStatus(){
+        return voice;
     }
 
-    public void setTextInstructionOn(){
-        editor.putString(TEXT_INSTRUCTION,ON);
+    public boolean getTextInstructionStatus(){
+        return text;
     }
 
-    public void setTextInstructionOff(){
-        editor.putString(TEXT_INSTRUCTION,OFF);
+    public boolean getTaximeterStatus(){
+        return taximeter;
     }
-
 }
 

@@ -48,10 +48,6 @@
             android:label="@string/title_activity_main"
             android:screenOrientation="landscape" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-
                 <action android:name="CONNECTION_SERVICE_INTENT" />
                 <action android:name="CONNECTION_STATUS" />
             </intent-filter>
@@ -59,7 +55,12 @@
 
         <service
             android:name=".Services.ConnectionService"
-            android:enabled="true" />
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="LOCATIONS_LIST" />
+                <action android:name="SOS" />
+            </intent-filter>
+        </service>
         <service
             android:name=".Services.LocationFinderService"
             android:enabled="true" />
@@ -86,7 +87,6 @@
             android:label="@string/title_activity_search_poi"
             android:screenOrientation="landscape" >
         </activity>
-
         <activity
             android:name=".Activities.MovementHistoryActivity"
             android:label="@string/title_activity_movement_history"
@@ -94,15 +94,27 @@
         </activity>
         <activity
             android:name=".Activities.FavoritePointActivity"
-            android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
             android:label="@string/title_activity_private_poi"
-            android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar" >
         </activity>
         <activity
             android:name=".Activities.FuelActivity"
-            android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
+            android:label="@string/title_activity_fuel"
             android:screenOrientation="landscape"
-            android:label="@string/title_activity_fuel" >
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar" >
+        </activity>
+        <activity
+            android:name=".Activities.SplashActivity"
+            android:label="@string/title_activity_splash"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
         </activity>
     </application>
 

@@ -3,7 +3,7 @@
 
     <string name="app_name">Pishgaman Asia</string>
     <string name="title_activity_main">Pishgaman Asia</string>
-    <string name="title_activity_setting">SettingActivity</string>
+    <string name="title_activity_setting">تنظیمات</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_messaging">MessagingActivity</string>
@@ -11,5 +11,6 @@
     <string name="title_activity_movement_history">MovementHistoryActivity</string>
     <string name="title_activity_private_poi">نقطه مکان ها</string>
     <string name="title_activity_fuel">مدیریت مصرف سوخت</string>
+    <string name="title_activity_splash">Splash</string>
 
 </resources>
