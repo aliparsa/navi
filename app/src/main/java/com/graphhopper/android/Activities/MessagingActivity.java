@@ -28,7 +28,7 @@ public class MessagingActivity extends Activity {
 
     private Context context;
     ListView lv;
-    SearchView searchView;
+    //SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,21 +38,21 @@ public class MessagingActivity extends Activity {
         context= this;
         lv = (ListView) findViewById(R.id.listView);
 
-        searchView = new SearchView(context);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                loadAndShowMessages(s);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                loadAndShowMessages(s);
-                return false;
-            }
-        });
-        lv.addHeaderView(searchView);
+       // searchView = new SearchView(context);
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String s) {
+//                loadAndShowMessages(s);
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String s) {
+//                loadAndShowMessages(s);
+//                return false;
+//            }
+//        });
+//        lv.addHeaderView(searchView);
 
         loadAndShowMessages(null);
 
@@ -84,7 +84,7 @@ public class MessagingActivity extends Activity {
 
             ListViewCustomAdapter adapter = new ListViewCustomAdapter(context, 0, messages);
             lv.setAdapter(adapter);
-            searchView.requestFocus();
+            //searchView.requestFocus();
 
     }}
 

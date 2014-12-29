@@ -1262,9 +1262,12 @@ public class MainActivity extends Activity {
         ConnectionStatusReceiver b = new ConnectionStatusReceiver();
         registerReceiver(b, a);
 
+  // todo unrigestrt kon
 
         super.onResume();
     }
+
+
 
 
     public static enum GpsState {connected, disconnected}

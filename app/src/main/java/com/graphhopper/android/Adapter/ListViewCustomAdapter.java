@@ -35,9 +35,6 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
 
     public static String MESSAGE_ITEM = "message item";
 
-
-
-
     public List<T> itemList;
     Context context;
     public int layoutResID;
@@ -149,8 +146,10 @@ public class ListViewCustomAdapter<T> extends ArrayAdapter<T> {
             holder.messageSubtitle = (TextView) ll_message.findViewById(R.id.message_subtitle);
 
 
-        holder.messageTitle.setText(item.getX2());
-        holder.messageSubtitle.setText(item.getX3());
+        if (item.getX1().equals("task")){
+            holder.messageTitle.setText("ماموریت" + " "+ item.getX6());
+        }
+        holder.messageSubtitle.setText(item.getX7());
     }
 
 
